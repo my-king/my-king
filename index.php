@@ -31,9 +31,6 @@
  */
 
 
-/**
- *@package raiz 
- */
 $config = parse_ini_file("system/config/config.ini", true);
 
 foreach ($config["includes"] as $file) {
