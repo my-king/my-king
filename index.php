@@ -37,14 +37,11 @@ foreach ($config["includes"] as $file) {
     require_once "system/" . $file . '.php';
 }
 
-/**
- * Instanciar as constantes predefinidas pelo sistema
- */
+// Definir as constante do sistema
 Path::getInstancia();
 
-/*
- * Iniciar aplicação
- */
+// iniicia aplicação
 $start = new System();
 $start->run();
+
 ?>
