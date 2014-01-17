@@ -8,7 +8,7 @@ class System {
     public $_action;
     public $_params;
 
-    public function System() {
+    public function __construct() {
         # Informa qual o conjunto de caracteres será usado.
         header('Content-Type: text/html; charset=iso-8859-1');
         $this->setUrl();

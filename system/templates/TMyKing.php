@@ -7,10 +7,10 @@ class TMyKing extends Controller {
 
     public $HTML;
 
-    public function TMyKing() {
-
-        parent::Controller();
-
+    public function __construct() {
+        
+        parent::__construct();
+        
         # Constantes
         define("TEMPLATE", 'TMyKing');
         define("PATH_TEMPLATE_URL", PATH_WEBFILES_URL . "templates/" . __CLASS__ . "/");
