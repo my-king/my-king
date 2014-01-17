@@ -82,6 +82,7 @@ class Path {
         //PATH URL
         define('PATH_URL', $PATH_URL);
         define('PATH_WEBFILES_URL', PATH_URL . WEBFILES);
+        define('PATH_TEMPLATE_URL', PATH_URL . "templates/");
         define('PATH_IMAGE_URL', PATH_WEBFILES_URL . "images/");
         define('PATH_JS_URL', PATH_WEBFILES_URL . "js/");
         define('PATH_JS_CORE_URL', PATH_JS_URL . "core/");

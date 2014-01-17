@@ -10,13 +10,13 @@ class TMyKing extends Controller {
     public function __construct() {
         
         parent::__construct();
-        
+
         # Constantes
-        define("TEMPLATE", 'TMyKing');
-        define("PATH_TEMPLATE_URL", PATH_WEBFILES_URL . "templates/" . __CLASS__ . "/");
-        define("PATH_TEMPLATE_JS_URL", PATH_TEMPLATE_URL . "js/");
-        define("PATH_TEMPLATE_CSS_URL", PATH_TEMPLATE_URL . "css/");
-        define("PATH_TEMPLATE_IMAGE_URL", PATH_TEMPLATE_URL . "images/");
+        define("TEMPLATE", __CLASS__ );
+        define("PATH_DIR_TEMPLATE_URL", PATH_TEMPLATE_URL . TEMPLATE . "/");
+        define("PATH_TEMPLATE_JS_URL", PATH_DIR_TEMPLATE_URL . "js/");
+        define("PATH_TEMPLATE_CSS_URL", PATH_DIR_TEMPLATE_URL . "css/");
+        define("PATH_TEMPLATE_IMAGE_URL", PATH_DIR_TEMPLATE_URL . "img/");        
 
         $this->HTML = new THtmlHelper();
     }

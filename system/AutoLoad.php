@@ -4,15 +4,15 @@ function __autoload($class) {
 
     $dir_template = null;
     if (defined('TEMPLATE')) {
-        $dir_template = PATH . "system/templates/helpers/" . TEMPLATE . "/";
+        $dir_template = PATH . "templates/" . TEMPLATE . "/helpers/";
     }
     
     if (defined('TEMPLATE') === true && file_exists($dir_template.$class.'.php') === true && preg_match('/^T[^a-z]*$/', $class{0}) && preg_match('/^[^a-z]*$/', $class{1}) && preg_match("/Helper$/", $class)) {
-        $dir = PATH . "system/templates/helpers/" . TEMPLATE . "/";
+        $dir = PATH . "templates/" . TEMPLATE . "/helpers/";
     } elseif (preg_match('/^T[^a-z]*$/', $class{0}) && preg_match('/^[^a-z]*$/', $class{1}) && preg_match("/Helper$/", $class)) {
-        $dir = PATH . "system/templates/helpers/";
+        $dir = PATH . "templates/helpers/";
     } elseif (preg_match('/^T[^a-z]*$/', $class{0}) && preg_match('/^[^a-z]*$/', $class{1})) {
-        $dir = PATH . "system/templates/";
+        $dir = PATH . "templates/";
     } elseif (preg_match("/Helper$/", $class)) {
         $dir = PATH . "system/helpers/";
     } elseif (preg_match('/^V[^a-z]*$/', $class{0}) && preg_match('/^[^a-z]*$/', $class{1}) && preg_match("/Model$/", $class)) {
