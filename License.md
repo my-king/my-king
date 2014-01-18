@@ -1,7 +1,6 @@
-
-
-		      LICENÇA PÚBLICA GERAL GNU
-		       Versão 2, junho de 1991
+<p>
+		      <h1>LICENÇA PÚBLICA GERAL GNU</h1>
+		       <h2>Versão 2, junho de 1991</h2>
 
  This is an unofficial translation of the GNU General Public License
  into Brazilian Portuguese. It was not published by the Free Software
@@ -19,6 +18,7 @@ Software Foundation, e legalmente não afirma os termos de distribuição
 
    Copyright (C) 1989, 1991 Free Software Foundation, Inc. 675 Mass Ave,
 		        Cambridge, MA 02139, USA
+</p>
 
 A qualquer pessoa é permitido copiar e distribuir cópias desse
 documento de licença, desde que sem qualquer alteração.
