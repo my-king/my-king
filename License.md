@@ -1,6 +1,6 @@
-		      <h3>LICENÇA PÚBLICA GERAL GNU</h3>
-		       <h4>Versão 2, junho de 1991</h4>
-<b align="center">
+<h3 align="center">LICENÇA PÚBLICA GERAL GNU</h3>
+<h4 align="center">Versão 2, junho de 1991</h4>
+<p align="center">
  This is an unofficial translation of the GNU General Public License
  into Brazilian Portuguese. It was not published by the Free Software
    Foundation, and does not legally state the distribution terms for
@@ -22,9 +22,11 @@ Software Foundation, e legalmente não afirma os termos de distribuição
 A qualquer pessoa é permitido copiar e distribuir cópias desse
 documento de licença, desde que sem qualquer alteração.
 
-</b>
+</p>
 
-			      Introdução
+
+<h4 align="center">Introdução</h4>
+<p align="center">
 
   As licenças de muitos software são desenvolvidas para restringir sua
 liberdade de compartilhá-lo e mudá-lo. Contrária a isso, a Licença
@@ -34,7 +36,7 @@ gratuito para os seus usuários. Esta Licença Pública Geral aplica-se à
 maioria dos software da Free Software Foundation e a qualquer outro
 programa cujo autor decida aplicá-la. (Alguns outros software da FSF
 são cobertos pela Licença Pública Geral de Bibliotecas, no entanto.)
-Você pode aplicá-la também aos seus programas.
+Você pode aplicá-la também aos seus programas.<br><br>
 
   Quando nos referimos a software livre, estamos nos referindo a
 liberdade e não a preço. Nossa Licença Pública Geral foi desenvolvida
@@ -42,20 +44,20 @@ para garantir que você tenha a liberdade de distribuir cópias de
 software livre (e cobrar por isso, se quiser); que você receba o
 código-fonte ou tenha acesso a ele, se quiser; que você possa mudar o
 software ou utilizar partes dele em novos programas livres e
-gratuitos; e que você saiba que pode fazer tudo isso.
+gratuitos; e que você saiba que pode fazer tudo isso.<br><br>
 
   Para proteger seus direitos, precisamos fazer restrições que impeçam
 a qualquer um negar estes direitos ou solicitar que você deles
 abdique. Estas restrições traduzem-se em certas responsabilidades para
-você, se você for distribuir cópias do software ou modificá-lo.
+você, se você for distribuir cópias do software ou modificá-lo.<br><br>
 
   Por exemplo, se você distribuir cópias de um programa, gratuitamente
 ou por alguma quantia, você tem que fornecer aos recebedores todos os
 direitos que você possui. Você tem que garantir que eles também
 recebam ou possam obter o código-fonte. E você tem que mostrar-lhes
-estes termos para que eles possam conhecer seus direitos.
+estes termos para que eles possam conhecer seus direitos.<br><br>
 
-  Nós protegemos seus direitos em dois passos: (1) com copyright do
+<b>Nós protegemos seus direitos em dois passos:</b><br><br>(1) com copyright do
 software e (2) com a oferta desta licença, que lhe dá permissão legal
 para copiar, distribuir e/ou modificar o software.
 
@@ -65,21 +67,25 @@ garantia nestes software livres. Se o software é modificado por alguém
 mais e passado adiante, queremos que seus recebedores saibam que o que
 eles obtiveram não é original, de forma que qualquer problema
 introduzido por terceiros não interfira na reputação do autor
-original.
+original.<br><br>
 
   Finalmente, qualquer programa é ameaçado constantemente por patentes
 de software. Queremos evitar o perigo de que distribuidores de
 software livre obtenham patentes individuais, o que tem o efeito de
 tornar o programa proprietário. Para prevenir isso, deixamos claro que
 qualquer patente tem que ser licenciada para uso livre e gratuito por
-qualquer pessoa, ou então que nem necessite ser licenciada.
+qualquer pessoa, ou então que nem necessite ser licenciada.<br><br>
 
-  Os termos e condições precisas para cópia, distribuição e
-modificação se encontram abaixo:
+</p>
+
+<h5 align="center">Os termos e condições precisas para cópia, distribuição e
+modificação se encontram abaixo:</h5>
+
 
-		      LICENÇA PÚBLICA GERAL GNU
-      TERMOS E CONDIÇÕES PARA CÓPIA, DISTRIBUIÇÃO E MODIFICAÇÃO
+<h4 align="center">LICENÇA PÚBLICA GERAL GNU</h4>
+<h5 align="center">TERMOS E CONDIÇÕES PARA CÓPIA, DISTRIBUIÇÃO E MODIFICAÇÃO</h4>
 
+<p align="center">
   0. Esta licença se aplica a qualquer programa ou outro trabalho que
 contenha um aviso colocado pelo detentor dos direitos autorais
 informando que aquele pode ser distribuído sob as condições desta
@@ -97,9 +103,11 @@ cobertas por esta Licença; elas estão fora de seu escopo.  O ato de
 executar o Programa não é restringido e o resultado do Programa é
 coberto apenas se seu conteúdo contenha trabalhos baseados no Programa
 (independentemente de terem sido gerados pela execução do
-Programa). Se isso é verdadeiro depende do que o programa faz.
+Programa). Se isso é verdadeiro depende do que o programa faz. 
+</p>
 
-  1. Você pode copiar e distribuir cópias fiéis do código-fonte do
+<p align="center">
+1. Você pode copiar e distribuir cópias fiéis do código-fonte do
 Programa da mesma forma que você o recebeu, usando qualquer meio,
 deste que você conspícua e apropriadamente publique em cada cópia um
 aviso de direitos autorais e uma declaração de inexistência de
@@ -107,36 +115,38 @@ garantias; mantenha intactas todos os avisos que se referem a esta
 Licença e à ausência total de garantias; e forneça a outros
 recebedores do Programa uma cópia desta Licença, junto com o Programa.
 
-Você pode cobrar pelo ato físico de transferir uma cópia e pode,
-opcionalmente, oferecer garantia em troca de pagamento.
+<br><br><b>Você pode cobrar pelo ato físico de transferir uma cópia e pode,
+opcionalmente, oferecer garantia em troca de pagamento.</b><br>
 
-  2. Você pode modificar sua cópia ou cópias do Programa, ou qualquer
+
+<br>2. Você pode modificar sua cópia ou cópias do Programa, ou qualquer
 parte dele, assim gerando um trabalho baseado no Programa, e copiar e
 distribuir essas modificações ou trabalhos sob os termos da seção 1
-acima, desde que você também se enquadre em todas estas condições:
+acima, desde que você também se enquadre em todas estas condições:</p>
+</p>
+<ul>
+<li>Você tem que fazer com que os arquivos modificados levem avisos
+proeminentes afirmando que você alterou os arquivos, incluindo a
+data de qualquer alteração.</li>
 
-    a) Você tem que fazer com que os arquivos modificados levem avisos
-    proeminentes afirmando que você alterou os arquivos, incluindo a
-    data de qualquer alteração.
+<li>Você tem que fazer com que quaisquer trabalhos que você
+distribua ou publique, e que integralmente ou em partes contenham
+ou sejam derivados do Programa ou de suas partes, sejam
+licenciados, integralmente e sem custo algum para quaisquer
+terceiros, sob os termos desta Licença.</li>
 
-    b) Você tem que fazer com que quaisquer trabalhos que você
-    distribua ou publique, e que integralmente ou em partes contenham
-    ou sejam derivados do Programa ou de suas partes, sejam
-    licenciados, integralmente e sem custo algum para quaisquer
-    terceiros, sob os termos desta Licença.
+<li>Se qualquer programa modificado normalmente lê comandos
+interativamente quando executados, você tem que fazer com que,
+quando iniciado tal uso interativo da forma mais simples, seja
+impresso ou mostrado um anúncio de que não há qualquer garantia
+(ou então que você fornece a garantia) e que os usuários podem
+redistribuir o programa sob estas condições, ainda informando os
+usuários como consultar uma cópia desta Licença. <b>(Exceção: se o
+Programa em si é interativo mas normalmente não imprime estes
+tipos de anúncios, seu trabalho baseado no Programa não precisa
+imprimir um anúncio.)</b></li></ul><br><br>
 
-    c) Se qualquer programa modificado normalmente lê comandos
-    interativamente quando executados, você tem que fazer com que,
-    quando iniciado tal uso interativo da forma mais simples, seja
-    impresso ou mostrado um anúncio de que não há qualquer garantia
-    (ou então que você fornece a garantia) e que os usuários podem
-    redistribuir o programa sob estas condições, ainda informando os
-    usuários como consultar uma cópia desta Licença. (Exceção: se o
-    Programa em si é interativo mas normalmente não imprime estes
-    tipos de anúncios, seu trabalho baseado no Programa não precisa
-    imprimir um anúncio.)
-
-Estas exigências aplicam-se ao trabalho modificado como um todo. Se
+<p align="center">Estas exigências aplicam-se ao trabalho modificado como um todo. Se
 seções identificáveis de tal trabalho não são derivadas do Programa, e
 podem ser razoavelmente consideradas trabalhos independentes e
 separados por si só, então esta Licença, e seus termos, não se aplicam
@@ -145,42 +155,43 @@ separado. Mas quando você distribuir as mesmas seções como parte de um
 todo que é trabalho baseado no Programa, a distribuição como um todo
 tem que se enquadrar nos termos desta Licença, cujas permissões para
 outros licenciados se estendem ao todo, portanto também para cada e
-toda parte independente de quem a escreveu.
+toda parte independente de quem a escreveu.<br><br>
 
 Desta forma, esta seção não tem a intenção de reclamar direitos os
 contestar seus direitos sobre o trabalho escrito completamente por
 você; ao invés disso, a intenção é a de exercitar o direito de
 controlar a distribuição de trabalhos, derivados ou coletivos,
-baseados no Programa.
+baseados no Programa.<br><br>
 
 Adicionalmente, a mera adição ao Programa de outro trabalho não
 baseado no Programa (ou de trabalho baseado no Programa) em um volume
 de armazenamento ou meio de distribuição não faz o outro trabalho
-parte do escopo desta Licença.
+parte do escopo desta Licença.<br><br>
 
-  3. Você pode copiar e distribuir o Programa (ou trabalho baseado
+<b>3. Você pode copiar e distribuir o Programa (ou trabalho baseado
 nele, conforme descrito na Seção 2) em código-objeto ou em forma
 executável sob os termos das Seções 1 e 2 acima, desde que você
-faça um dos seguintes:
+faça um dos seguintes:</b><br><br>
 
-    a) O acompanhe com o código-fonte completo e em forma acessível
-    por máquinas, que tem que ser distribuído sob os termos das Seções
-    1 e 2 acima e em meio normalmente utilizado para o intercâmbio de
-    software; ou,
+<ul>
+<li>a) O acompanhe com o código-fonte completo e em forma acessível
+por máquinas, que tem que ser distribuído sob os termos das Seções
+1 e 2 acima e em meio normalmente utilizado para o intercâmbio de
+software; ou,</li>
 
-    b) O acompanhe com uma oferta escrita, válida por pelo menos três
-    anos, de fornecer a qualquer um, com um custo não superior ao
-    custo de distribuição física do material, uma cópia do
-    código-fonte completo e em forma acessível por máquinas, que tem
-    que ser distribuído sob os termos das Seções 1 e 2 acima e em meio
-    normalmente utilizado para o intercâmbio de software; ou,
+<li>b) O acompanhe com uma oferta escrita, válida por pelo menos três
+anos, de fornecer a qualquer um, com um custo não superior ao
+custo de distribuição física do material, uma cópia do
+código-fonte completo e em forma acessível por máquinas, que tem
+que ser distribuído sob os termos das Seções 1 e 2 acima e em meio
+normalmente utilizado para o intercâmbio de software; ou,</li>
 
-    c) O acompanhe com a informação que você recebeu em relação à
-    oferta de distribuição do código-fonte correspondente. (Esta
-    alternativa é permitida somente em distribuição não comerciais, e
-    apenas se você recebeu o programa em forma de código-objeto ou
-    executável, com oferta de acordo com a Subseção b acima.)
-
+<li>c) O acompanhe com a informação que você recebeu em relação à
+oferta de distribuição do código-fonte correspondente. (Esta
+alternativa é permitida somente em distribuição não comerciais, e
+apenas se você recebeu o programa em forma de código-objeto ou
+executável, com oferta de acordo com a Subseção b acima.)</li>
+</ul>
 O código-fonte de um trabalho corresponde à forma de trabalho
 preferida para se fazer modificações. Para um trabalho em forma
 executável, o código-fonte completo significa todo o código-fonte de
@@ -288,7 +299,7 @@ Foundation; às vezes nós permitimos exceções a este caso. Nossa
 decisão será guiada pelos dois objetivos de preservar a condição de
 liberdade de todas as derivações do nosso software livre, e de
 promover o compartilhamento e reutilização de software em aspectos
-gerais.
+gerais.</p>
 
 			AUSÊNCIA DE GARANTIAS
 
