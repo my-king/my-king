@@ -327,7 +327,7 @@ PARTE TENHAM SIDO AVISADOS DA POSSIBILIDADE DE TAIS DANOS.
 
 <h4 align="center">FIM DOS TERMOS E CONDIÇÕES</h4>
 
-	  Como Aplicar Estes Termos aos Seus Novos Programas
+<b>Como Aplicar Estes Termos aos Seus Novos Programas</b>
 
   Se você desenvolver um novo programa, e quer que ele seja utilizado
 amplamente pelo público, a melhor forma de alcançar este objetivo é
