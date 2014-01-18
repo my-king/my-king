@@ -1,6 +1,6 @@
-<p>
-		      <h1>LICENÇA PÚBLICA GERAL GNU</h1>
-		       <h2>Versão 2, junho de 1991</h2>
+<p align="center">
+		      <h4>LICENÇA PÚBLICA GERAL GNU</h4>
+		       <h5>Versão 2, junho de 1991</h5>
 
  This is an unofficial translation of the GNU General Public License
  into Brazilian Portuguese. It was not published by the Free Software
@@ -8,7 +8,8 @@
    software that uses the GNU GPL -- only the original English text of
    the GNU GPL does that. However, we hope that this translation will
   help Brazilian Portuguese speakers understand the GNU GPL better.
-
+<br>
+<br>
   Esta é uma tradução não-oficial da Licença Pública Geral GNU ("GPL
   GNU") para o português do Brasil. Ela não foi publicada pela Free
 Software Foundation, e legalmente não afirma os termos de distribuição
