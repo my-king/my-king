@@ -1,6 +1,6 @@
 <h3 align="center">LICENÇA PÚBLICA GERAL GNU</h3>
 <h4 align="center">Versão 2, junho de 1991</h4>
-<p align="center">
+<p align="justify">
  This is an unofficial translation of the GNU General Public License
  into Brazilian Portuguese. It was not published by the Free Software
    Foundation, and does not legally state the distribution terms for
@@ -26,7 +26,7 @@ documento de licença, desde que sem qualquer alteração.
 
 
 <h4 align="center">Introdução</h4>
-<p align="center">
+<p align="justify">
 
   As licenças de muitos software são desenvolvidas para restringir sua
 liberdade de compartilhá-lo e mudá-lo. Contrária a isso, a Licença
@@ -85,7 +85,7 @@ modificação se encontram abaixo:</h5>
 <h4 align="center">LICENÇA PÚBLICA GERAL GNU</h4>
 <h5 align="center">TERMOS E CONDIÇÕES PARA CÓPIA, DISTRIBUIÇÃO E MODIFICAÇÃO</h4>
 
-<p align="center">
+<p align="justify">
   0. Esta licença se aplica a qualquer programa ou outro trabalho que
 contenha um aviso colocado pelo detentor dos direitos autorais
 informando que aquele pode ser distribuído sob as condições desta
@@ -106,7 +106,7 @@ coberto apenas se seu conteúdo contenha trabalhos baseados no Programa
 Programa). Se isso é verdadeiro depende do que o programa faz. 
 </p>
 
-<p align="center">
+<p align="justify">
 1. Você pode copiar e distribuir cópias fiéis do código-fonte do
 Programa da mesma forma que você o recebeu, usando qualquer meio,
 deste que você conspícua e apropriadamente publique em cada cópia um
@@ -144,9 +144,9 @@ redistribuir o programa sob estas condições, ainda informando os
 usuários como consultar uma cópia desta Licença. <b>(Exceção: se o
 Programa em si é interativo mas normalmente não imprime estes
 tipos de anúncios, seu trabalho baseado no Programa não precisa
-imprimir um anúncio.)</b></li></ul><br><br>
+imprimir um anúncio.)</b></li></ul><br>
 
-<p align="center">Estas exigências aplicam-se ao trabalho modificado como um todo. Se
+<p align="justify">Estas exigências aplicam-se ao trabalho modificado como um todo. Se
 seções identificáveis de tal trabalho não são derivadas do Programa, e
 podem ser razoavelmente consideradas trabalhos independentes e
 separados por si só, então esta Licença, e seus termos, não se aplicam
@@ -301,7 +301,7 @@ liberdade de todas as derivações do nosso software livre, e de
 promover o compartilhamento e reutilização de software em aspectos
 gerais.</p>
 
-			AUSÊNCIA DE GARANTIAS
+<h4 align="center">AUSÊNCIA DE GARANTIAS</h4>
 
   11. UMA VEZ QUE O PROGRAMA É LICENCIADO SEM ÔNUS, NÃO HÁ QUALQUER
 GARANTIA PARA O PROGRAMA, NA EXTENSÃO PERMITIDA PELAS LEIS
@@ -325,7 +325,7 @@ PERDAS SOFRIDAS POR VOCÊ OU POR OUTRAS PARTES, OU FALHAS DO PROGRAMA
 AO OPERAR COM QUALQUER OUTRO PROGRAMA), MESMO QUE TAL DETENTOR OU
 PARTE TENHAM SIDO AVISADOS DA POSSIBILIDADE DE TAIS DANOS.
 
-		      FIM DOS TERMOS E CONDIÇÕES
+<h4 align="center">FIM DOS TERMOS E CONDIÇÕES</h4>
 
 	  Como Aplicar Estes Termos aos Seus Novos Programas
 
