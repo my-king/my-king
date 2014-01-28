@@ -1,6 +1,6 @@
 <h2 align="center">My KinG</h2>
 <p align="center">
-  <img src="http://s18.postimg.org/crj5amow9/myking.png" /><br><b>Framework - PHP</b>
+  <img src="http://s3.postimg.org/3qqgo25sz/lamp.png" /><br><b>Framework - PHP</b>
 </p>
  
 
