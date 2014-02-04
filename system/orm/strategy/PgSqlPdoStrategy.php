@@ -507,14 +507,24 @@ class PgSqlPdoStrategy {
                             unset($strategy);
                         } elseif (isset($propriedades['ManyToMany'])) {
 
-                            foreach ($object->$getValue() as $key => $item) {
-                                if (is_object($item)) {
-                                    $dados[$atributo][$key] = $item->getId();
-                                } else {
-                                    $dados[$atributo] = $object->$getValue();
-                                    break;
+                            $objectGetValue = $object->$getValue();
+
+                            if (isset($objectGetValue[0])) {
+                                unset($objectGetValue);
+
+                                foreach ($object->$getValue() as $key => $item) {
+                                    if (is_object($item)) {
+                                        $dados[$atributo][$key] = $item->getId();
+                                    } else {
+                                        $dados[$atributo] = $object->$getValue();
+                                        break;
+                                    }
                                 }
+                            } else {
+                                unset($objectGetValue);
+                                $dados[$atributo] = $object->$getValue();
                             }
+                            
                         }
                     } else {
                         $dados[$atributo] = $object->$getValue();
@@ -524,6 +534,7 @@ class PgSqlPdoStrategy {
                 }
             }
         }
+
         # Limpar memoria
         unset($object);
         # retornar dados
@@ -1548,11 +1559,14 @@ class PgSqlPdoStrategy {
 
                         if (isset($dados[$atributo])) {
 
-                            if (count($dados[$atributo]) > 0) {
+                            $objLoadGetValue = $objectLoad->$getValue();
+
+                            if ( isset($dados[$atributo][0]) ) {
 
                                 $flag = 0;
 
-                                if (count($objectLoad->$getValue()) > 0) {
+                                if (isset($objLoadGetValue[0])) {
+                                    unset($objLoadGetValue);
 
                                     if (count($objectLoad->$getValue()) != count($dados[$atributo])) {
                                         $flag++;
@@ -1581,7 +1595,8 @@ class PgSqlPdoStrategy {
 
                                 unset($flag);
                             } else {
-                                if (count($objectLoad->$getValue()) > 0) {
+                                if (isset($objLoadGetValue[0])) {
+                                    unset($objLoadGetValue);
                                     $collection[$atributo] = array();
                                 }
                             }
@@ -1753,7 +1768,7 @@ class PgSqlPdoStrategy {
                     foreach ($collection[$atrib] as $atributo => $array) {
 
                         if ($atributo != "@query") {
-                            if (count($array) > 0) {
+                            if (isset($array[0])) {
 
                                 $prepare = $this->conn->prepare($collection[$atrib]['@query']['insert']);
 
