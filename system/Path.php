@@ -52,9 +52,9 @@ class Path {
         define('ROOT', $config['application']['root']);
 
         // Pastas padrões 
-        define('APP', 'app/');
-        define('CONTROLLERS', 'app/controllers/');
-        define('VIEWS', 'app/view/');
+        defined('APP') or define('APP', 'app/');
+        define('CONTROLLERS', APP.'controllers/');
+        define('VIEWS', APP.'view/');
         define('WEBFILES', 'public/');
 
         if (ROOT == "/") {
