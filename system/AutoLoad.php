@@ -26,17 +26,17 @@ function __autoload($class) {
     } elseif (preg_match("/Strategy$/", $class)) {
         $dir = PATH . "system/orm/strategy/";
     } elseif (preg_match('/^V[^a-z]*$/', $class{0}) && preg_match('/^[^a-z]*$/', $class{1}) && preg_match("/Logic$/", $class)) {
-        $dir = PATH . "app/model/logic/views/";
+        $dir = PATH . APP . "model/logic/views/";
     } elseif (preg_match("/Logic$/", $class)) {
-        $dir = PATH . "app/model/logic/";
+        $dir = PATH . APP . "model/logic/";
     } elseif (preg_match('/^V[^a-z]*$/', $class{0}) && preg_match('/^[^a-z]*$/', $class{1}) && preg_match("/DAO$/", $class)) {
-        $dir = PATH . "app/model/dao/views/";
+        $dir = PATH . APP . "model/dao/views/";
     } elseif (preg_match("/DAO$/", $class)) {
-        $dir = PATH . "app/model/dao/";
+        $dir = PATH . APP . "model/dao/";
     } elseif (preg_match('/^V[^a-z]*$/', $class{0}) && preg_match('/^[^a-z]*$/', $class{1})) {
-        $dir = PATH . "app/model/entity/views/";
+        $dir = PATH . APP . "model/entity/views/";
     } else {
-        $dir = PATH . "app/model/entity/";
+        $dir = PATH . APP . "model/entity/";
     }
 
     $path_class = $dir . $class . ".php";
