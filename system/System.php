@@ -9,8 +9,8 @@ class System {
     public $_params;
 
     public function __construct() {
-        # Informa qual o conjunto de caracteres ser� usado.
-        header('Content-Type: text/html; charset=iso-8859-1');
+        # Informa qual o conjunto de caracteres será usado.
+        header('Content-Type: text/html; charset=utf-8'); # Padrão utf-8
         $this->setUrl();
         $this->setExplode();
         $this->setController();
