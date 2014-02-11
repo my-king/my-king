@@ -1,0 +1,12 @@
+#erro{
+    background: white;
+    padding: 5px;
+    border: 1px solid red;
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+p{
+    font-weight: bold;
+}
