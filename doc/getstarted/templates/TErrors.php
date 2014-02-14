@@ -7,7 +7,6 @@
 class TErrors extends Controller {
 
     public $HTML;
-    public $NAVIGATOR;
 
     public function __construct() {
 
@@ -22,7 +21,6 @@ class TErrors extends Controller {
 
         # Iniciar Helpers
         $this->HTML = new THtmlHelper();
-        $this->NAVIGATOR = TBrowserHelper::getBrowser();
     }
 
     public function init() {

@@ -1,9 +1,9 @@
 <?php
 
-class IndexController extends TMyKing{
+class IndexController extends TMetroUI{
     
     public function index() {
-        $this->TStart('index');
+        $this->TPageStart('index');
     }
     
 }

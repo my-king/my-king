@@ -41,7 +41,7 @@ class Path {
     }
 
     public function __clone() {
-        trigger_error('Clone não permitido.', E_USER_ERROR);
+        trigger_error('Clone nï¿½o permitido.', E_USER_ERROR);
     }
 
     private function defineConstantes() {
@@ -50,8 +50,9 @@ class Path {
 
         //Application
         define('ROOT', $config['application']['root']);
+        define('NAME_SIS', strtoupper($config['application']['nome']));
 
-        // Pastas padrões 
+        // Pastas padrï¿½es 
         defined('APP') or define('APP', ( isset($config['application']['app']) ? $config['application']['app'] : 'app/'));
         define('CONTROLLERS', APP.'controllers/');
         define('VIEWS', APP.'view/');
