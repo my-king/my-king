@@ -4,6 +4,7 @@ class PgSqlPdoStrategy {
 
     private $conn;
     private $reflection;
+    private $schema;
     private $tabela;
     private $colunas;
     private $propAtributos;
@@ -11,6 +12,7 @@ class PgSqlPdoStrategy {
     public function __construct(&$conn, $reflection) {
         $this->conn = $conn;
         $this->reflection = $reflection;
+        $this->schema = $this->reflection->getClassAnnotations('@Schema');
         $this->tabela = $this->reflection->getClassAnnotations('@Table');
         $this->colunas = implode($this->reflection->getColmap(), ',');
         $this->propAtributos = $this->reflection->getPropAtributos();
@@ -26,6 +28,56 @@ class PgSqlPdoStrategy {
 
     public function getIdColmap() {
         return $this->propAtributos['id']['Colmap'];
+    }
+
+    public function getSchema() {
+        return $this->schema;
+    }
+
+    private function order($dados = array()) {
+
+        $colmap = $this->propAtributos[$dados[0]]['Colmap'];
+
+        $pesistencia = null;
+        if (isset($this->propAtributos[$dados[0]]['Persistence'])) {
+            $pesistencia = $this->propAtributos[$dados[0]]['Persistence'];
+        }
+
+        $order = '';
+        if (isset($dados[1])) {
+            $order = $dados[1];
+        }
+
+        $queryOrder = "lower(to_ascii({$colmap},'LATIN1'))";
+
+        if ($pesistencia !== null) {
+
+            switch ($pesistencia->type) {
+                case 'inteiro':
+                    $queryOrder = $colmap;
+                    break;
+                case 'decimal':
+                    $queryOrder = $colmap;
+                    break;
+
+                default:
+                    $queryOrder = "lower(to_ascii({$colmap},'LATIN1'))";
+                    break;
+            }
+        }
+
+
+        $orderby = $queryOrder;
+        if ($order !== '') {
+            $orderby .= ' ' . $order;
+        }
+
+        unset($colmap);
+        unset($pesistencia);
+        unset($queryOrder);
+        unset($dados);
+
+        return $orderby;
     }
 
     private function getOrderby($orderby = null) {
@@ -44,12 +96,10 @@ class PgSqlPdoStrategy {
 
                     if ($order) {
                         $dados = explode(":", $orderByAtributo);
-                        $colmap = $this->propAtributos[$dados[0]]['Colmap'];
-                        $order = $dados[1];
-                        $colunas[] = "{$colmap} {$order}";
+                        $colunas[] = $this->order($dados);
                     } else {
-                        $colmap = $this->propAtributos[$orderByAtributo]['Colmap'];
-                        $colunas[] = $colmap;
+                        $dados[0] = $orderByAtributo;
+                        $colunas[] = $this->order($dados);
                     }
 
                     unset($colmap);
@@ -66,13 +116,10 @@ class PgSqlPdoStrategy {
                 $order = strpos($orderby, ':');
                 if ($order) {
                     $dados = explode(':', $orderby);
-                    $colmap = $this->propAtributos[$dados[0]]['Colmap'];
-                    $order = $dados[1];
-                    $orderby = "ORDER BY {$colmap} {$order}";
-                    unset($dados);
+                    $orderby = 'ORDER BY ' . $this->order($dados);
                 } else {
-                    $colmap = $this->propAtributos[$orderby]['Colmap'];
-                    $orderby = "ORDER BY {$colmap}";
+                    $dados[0] = $orderby;
+                    $orderby = 'ORDER BY ' . $this->order($dados);
                 }
 
                 unset($colmap);
@@ -174,7 +221,7 @@ class PgSqlPdoStrategy {
 
         $where = ($where !== null) ? "WHERE {$where}" : "";
         $orderby = $this->getOrderby($orderby);
-        $query = "SELECT {$colunas} FROM {$this->tabela} $where {$orderby}";
+        $query = "SELECT {$colunas} FROM {$this->schema}.{$this->tabela} $where {$orderby}";
 
         try {
             $prepare = $this->conn->prepare($query);
@@ -205,7 +252,7 @@ class PgSqlPdoStrategy {
     public function obter($where, $objectCollection = null) {
 
         $where = "WHERE {$where}";
-        $query = "SELECT {$this->colunas} FROM {$this->tabela} $where";
+        $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} $where";
         $result = $this->select($query);
 
         if (!$result) {
@@ -227,7 +274,7 @@ class PgSqlPdoStrategy {
         $ide_colmap = $this->propAtributos['id']['Colmap'];
 
         # cria query
-        $query = "SELECT {$this->colunas} FROM {$this->tabela} WHERE {$ide_colmap} = :id";
+        $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} WHERE {$ide_colmap} = :id";
 
         # Executar query
         $dados['id'] = $id;
@@ -249,7 +296,7 @@ class PgSqlPdoStrategy {
         $ide_colmap = $this->propAtributos['id']['Colmap'];
 
         # cria query
-        $query = "SELECT {$this->colunas} FROM {$this->tabela} WHERE {$ide_colmap} = :id";
+        $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} WHERE {$ide_colmap} = :id";
 
         # Executar query
         $dados['id'] = $id;
@@ -282,7 +329,7 @@ class PgSqlPdoStrategy {
 
         $orderby = $this->getOrderby($orderby);
 
-        $query = "SELECT {$this->colunas} FROM {$this->tabela} {$where} {$orderby} {$offset}";
+        $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} {$where} {$orderby} {$offset}";
         $result = $this->selectAll($query);
 
         if (!$result || count($result) == 0) {
@@ -304,7 +351,11 @@ class PgSqlPdoStrategy {
      */
     public function totalRegistro($where = null) {
         $where = ($where != null) ? "WHERE {$where}" : '';
-        $query = "SELECT count({$this->getIdColmap()}) AS total FROM {$this->getTable()} {$where}";
+        if ($this->getSchema() !== false) {
+            $query = "SELECT count({$this->getIdColmap()}) AS total FROM {$this->getSchema()}.{$this->getTable()} {$where}";
+        } else {
+            $query = "SELECT count({$this->getIdColmap()}) AS total FROM {$this->getTable()} {$where}";
+        }
         $totalRegistros = $this->select($query);
         return $totalRegistros['total'];
     }
@@ -326,9 +377,14 @@ class PgSqlPdoStrategy {
 
         # Definir WHERE
         $where = ($where !== null) ? "WHERE {$where}" : '';
-        $query = "SELECT Sum({$coluna}) AS total FROM {$this->getTable()} {$where}";
-        $totalRegistros = $this->select($query);
 
+        if ($this->getSchema() !== false) {
+            $query = "SELECT Sum({$coluna}) AS total FROM {$this->getSchema()}.{$this->getTable()} {$where}";
+        } else {
+            $query = "SELECT Sum({$coluna}) AS total FROM {$this->getTable()} {$where}";
+        }
+
+        $totalRegistros = $this->select($query);
         return ($totalRegistros['total'] === NULL) ? 0 : $totalRegistros['total'];
     }
 
@@ -354,7 +410,7 @@ class PgSqlPdoStrategy {
 
         $orderby = $this->getOrderby($orderby);
 
-        $query = "SELECT {$this->colunas} FROM {$this->tabela} {$where} {$orderby}";
+        $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} {$where} {$orderby}";
         $result = $this->selectAll($query);
 
         if (!$result || count($result) == 0) {
@@ -468,6 +524,7 @@ class PgSqlPdoStrategy {
                                 unset($objectGetValue);
                                 $dados[$atributo] = $object->$getValue();
                             }
+                            
                         }
                     } else {
                         $dados[$atributo] = $object->$getValue();
@@ -591,7 +648,7 @@ class PgSqlPdoStrategy {
 
         # Pegar colmap do id
         $ide_colmap = $this->propAtributos['id']['Colmap'];
-        $query = "DELETE FROM {$this->tabela} WHERE {$ide_colmap} = :{$ide_colmap}";
+        $query = "DELETE FROM {$this->schema}.{$this->tabela} WHERE {$ide_colmap} = :{$ide_colmap}";
 
         // Deletar intens da base de dados
         try {
@@ -626,7 +683,7 @@ class PgSqlPdoStrategy {
 
         # Pegar colmap do id
         $ide_colmap = $this->propAtributos['id']['Colmap'];
-        $query = "DELETE FROM {$this->tabela} WHERE {$ide_colmap} = :{$ide_colmap}";
+        $query = "DELETE FROM {$this->schema}.{$this->tabela} WHERE {$ide_colmap} = :{$ide_colmap}";
 
         // Deletar intens da base de dados
         try {
@@ -661,7 +718,7 @@ class PgSqlPdoStrategy {
      */
     public function excluir($where, $dados = null) {
 
-        $query = "DELETE FROM {$this->tabela} WHERE {$where}";
+        $query = "DELETE FROM {$this->schema}.{$this->tabela} WHERE {$where}";
 
         // Deletar intens da base de dados
         try {
@@ -944,12 +1001,19 @@ class PgSqlPdoStrategy {
 
                     $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
-                    if (isset($propriedades['ManyToMany']['coluna'])) {
-                        $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                    if (isset($propriedades['ManyToMany']['schema'])) {
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        }
                     } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        }
                     }
-
                     unset($selectException);
 
                     $result = $this->selectAll($query);
@@ -984,9 +1048,9 @@ class PgSqlPdoStrategy {
                     $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
 
                     if (isset($propriedades['OneToMany']['coluna'])) {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
+                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
                     } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$id_colmap} = '{$objeto->getId()}'";
+                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$id_colmap} = '{$objeto->getId()}'";
                     }
 
                     $listObjeto = $this->selectAll($query);
@@ -1007,12 +1071,19 @@ class PgSqlPdoStrategy {
 
                     $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
-                    if (isset($propriedades['ManyToMany']['coluna'])) {
-                        $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                    if (isset($propriedades['ManyToMany']['schema'])) {
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        }
                     } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        }
                     }
-
                     $result = $this->selectAll($query);
                     unset($query);
 
@@ -1120,12 +1191,19 @@ class PgSqlPdoStrategy {
 
                     $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
-                    if (isset($propriedades['ManyToMany']['coluna'])) {
-                        $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                    if (isset($propriedades['ManyToMany']['schema'])) {
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        }
                     } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                        }
                     }
-
                     unset($selectException);
 
                     $result = $this->selectAll($query);
@@ -1159,9 +1237,9 @@ class PgSqlPdoStrategy {
                     $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
 
                     if (isset($propriedades['OneToMany']['coluna'])) {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
+                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
                     } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$id_colmap} = '{$objeto->getId()}'";
+                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$id_colmap} = '{$objeto->getId()}'";
                     }
 
                     $listObjeto = $this->selectAll($query);
@@ -1181,10 +1259,18 @@ class PgSqlPdoStrategy {
 
                     $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
-                    if (isset($propriedades['ManyToMany']['coluna'])) {
-                        $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                    if (isset($propriedades['ManyToMany']['schema'])) {
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        }
                     } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        }
                     }
 
                     $result = $this->selectAll($query);
@@ -1313,7 +1399,7 @@ class PgSqlPdoStrategy {
 
             $campos = implode(", ", array_keys($inserir['entity']));
             $values = ":" . implode(", :", array_keys($inserir['entity']));
-            $insert_query = "INSERT INTO {$this->tabela} ({$campos}) VALUES ({$values})";
+            $insert_query = "INSERT INTO {$this->schema}.{$this->tabela} ({$campos}) VALUES ({$values}) RETURNING {$id_colmap}";
 
             unset($campos);
             unset($values);
@@ -1332,7 +1418,7 @@ class PgSqlPdoStrategy {
                         $values = ":" . implode(", :", array_keys($k));
 
                         # Query
-                        $insertOneToMany[$atributo][$key]['@query'] = "INSERT INTO " . $strategy->getTable() . " ({$campos}) VALUES ({$values})";
+                        $insertOneToMany[$atributo][$key]['@query'] = "INSERT INTO " . $strategy->getSchema() . "." . $strategy->getTable() . " ({$campos}) VALUES ({$values})";
 
                         # Montar BindValue
                         foreach ($row as $atrib => $value) {
@@ -1357,8 +1443,12 @@ class PgSqlPdoStrategy {
                     $reflectionRelationship = new ReflectionORM($relationship['objeto']);
                     $id_relationship = $reflectionRelationship->getPropAnnotations('id', '@Colmap');
 
-
-                    $insertManyToMany[$atributo]['@query'] = "INSERT INTO {$relationship['table']} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+                    # Verifica schema
+                    if (isset($relationship['schema'])) {
+                        $insertManyToMany[$atributo]['@query'] = "INSERT INTO {$relationship['schema']}.{$relationship['table']} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+                    } else {
+                        $insertManyToMany[$atributo]['@query'] = "INSERT INTO {$this->schema}.{$relationship['table']} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+                    }
 
                     foreach ($values as $value) {
                         $insertManyToMany[$atributo][$id_relationship][] = $value;
@@ -1390,7 +1480,8 @@ class PgSqlPdoStrategy {
 
             $prepare->execute();
 
-            $id_entity = $this->conn->lastInsertId();
+            $id_entity = $prepare->fetch(PDO::FETCH_ASSOC);
+            $id_entity = $id_entity[$id_colmap];
 
             if (isset($insertOneToMany)) {
 
@@ -1470,7 +1561,7 @@ class PgSqlPdoStrategy {
 
                             $objLoadGetValue = $objectLoad->$getValue();
 
-                            if (isset($dados[$atributo][0])) {
+                            if ( isset($dados[$atributo][0]) ) {
 
                                 $flag = 0;
 
@@ -1593,7 +1684,7 @@ class PgSqlPdoStrategy {
             }
             $campos = implode(",", $camposUpdate);
             unset($camposUpdate);
-            $updateQueryEntity = "UPDATE {$this->tabela} SET {$campos} WHERE {$id_colmap} = {$id_entity}";
+            $updateQueryEntity = "UPDATE {$this->schema}.{$this->tabela} SET {$campos} WHERE {$id_colmap} = {$id_entity}";
         }
 
         // Preparar query da collection
@@ -1611,13 +1702,24 @@ class PgSqlPdoStrategy {
                     # verificar exception e definir where do delete
                     $deleteException = (isset($exception['delete'][$atributo])) ? "AND " . $exception['delete'][$atributo] : "";
 
-
-                    $collection[$atributo]['@query']['delete'] = "DELETE FROM {$relationship->table} WHERE {$id_colmap} = :{$id_colmap} {$deleteException}";
+                    # Verificar o schema e criar o delete
+                    if (isset($relationship->schema)) {
+                        $collection[$atributo]['@query']['delete'] = "DELETE FROM {$relationship->schema}.{$relationship->table} WHERE {$id_colmap} = :{$id_colmap} {$deleteException}";
+                    } else {
+                        $collection[$atributo]['@query']['delete'] = "DELETE FROM {$this->schema}.{$relationship->table} WHERE {$id_colmap} = :{$id_colmap} {$deleteException}";
+                    }
 
                     unset($deleteException);
 
                     if (count($update['collection'][$atributo]) > 0) {
-                        $collection[$atributo]['@query']['insert'] = "INSERT INTO {$relationship->table} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+
+                        # Verificar o schema
+                        if (isset($relationship->schema)) {
+                            $collection[$atributo]['@query']['insert'] = "INSERT INTO {$relationship->schema}.{$relationship->table} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+                        } else {
+                            $collection[$atributo]['@query']['insert'] = "INSERT INTO {$this->schema}.{$relationship->table} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+                        }
+
                         foreach ($campos as $value) {
                             $collection[$atributo][$id_relationship][] = $value;
                         }
