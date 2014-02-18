@@ -1,6 +1,6 @@
 <?php
 
-class PgSqlPdoStrategy {
+class MySqlPdoStrategy {
 
     private $conn;
     private $reflection;
@@ -265,9 +265,8 @@ class PgSqlPdoStrategy {
      * @param type $objectCollection
      * @return boolean
      */
-    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null) {
+    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null) {
 
-        $offset = ($offset !== null) ? 'LIMIT ' . LIMIT . ' OFFSET ' . $offset : '';
         if ($where != null) {
             $where = "WHERE {$where}";
 
@@ -282,7 +281,7 @@ class PgSqlPdoStrategy {
 
         $orderby = $this->getOrderby($orderby);
 
-        $query = "SELECT {$this->colunas} FROM {$this->tabela} {$where} {$orderby} {$offset}";
+        $query = "SELECT {$this->colunas} FROM {$this->tabela} {$where} {$orderby}";
         $result = $this->selectAll($query);
 
         if (!$result || count($result) == 0) {
@@ -295,41 +294,6 @@ class PgSqlPdoStrategy {
         }
 
         return $collection;
-    }
-
-    /**
-     * Total de registro de uma tabela
-     * @param type $where
-     * @return total
-     */
-    public function totalRegistro($where = null) {
-        $where = ($where != null) ? "WHERE {$where}" : '';
-        $query = "SELECT count({$this->getIdColmap()}) AS total FROM {$this->getTable()} {$where}";
-        $totalRegistros = $this->select($query);
-        return $totalRegistros['total'];
-    }
-
-    /**
-     * Efetuar a soma de um atributo de uma tabela
-     * @param type $coluna
-     * @param type $where
-     * @return total
-     */
-    public function somar($atributo, $where = null) {
-        # Atributo existe um Colmap
-        if (!isset($this->propAtributos[$atributo]['Colmap'])) {
-            return false;
-        }
-
-        # pegar valor da coluna
-        $coluna = $this->propAtributos[$atributo]['Colmap'];
-
-        # Definir WHERE
-        $where = ($where !== null) ? "WHERE {$where}" : '';
-        $query = "SELECT Sum({$coluna}) AS total FROM {$this->getTable()} {$where}";
-        $totalRegistros = $this->select($query);
-
-        return ($totalRegistros['total'] === NULL) ? 0 : $totalRegistros['total'];
     }
 
     /**
@@ -390,7 +354,7 @@ class PgSqlPdoStrategy {
 
                     if (is_object($array[0])) {
 
-                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM(get_class($array[0])));
+                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM(get_class($array[0])));
 
                         foreach ($array as $objeto) {
                             $arrayObjeto[] = $strategy->objectToArray($objeto);
@@ -438,7 +402,7 @@ class PgSqlPdoStrategy {
 
                         if (isset($propriedades['OneToMany'])) {
 
-                            $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                            $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
 
                             foreach ($object->$getValue() as $key => $item) {
                                 if (is_object($item)) {
@@ -451,22 +415,13 @@ class PgSqlPdoStrategy {
                             unset($strategy);
                         } elseif (isset($propriedades['ManyToMany'])) {
 
-                            $objectGetValue = $object->$getValue();
-
-                            if (isset($objectGetValue[0])) {
-                                unset($objectGetValue);
-
-                                foreach ($object->$getValue() as $key => $item) {
-                                    if (is_object($item)) {
-                                        $dados[$atributo][$key] = $item->getId();
-                                    } else {
-                                        $dados[$atributo] = $object->$getValue();
-                                        break;
-                                    }
+                            foreach ($object->$getValue() as $key => $item) {
+                                if (is_object($item)) {
+                                    $dados[$atributo][$key] = $item->getId();
+                                } else {
+                                    $dados[$atributo] = $object->$getValue();
+                                    break;
                                 }
-                            } else {
-                                unset($objectGetValue);
-                                $dados[$atributo] = $object->$getValue();
                             }
                         }
                     } else {
@@ -477,7 +432,6 @@ class PgSqlPdoStrategy {
                 }
             }
         }
-
         # Limpar memoria
         unset($object);
         # retornar dados
@@ -523,7 +477,7 @@ class PgSqlPdoStrategy {
                     if (is_array($array[$atributo])) {
 
                         if (isset($propriedades['OneToMany'])) {
-                            $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                            $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
                             foreach ($array[$atributo] as $key => $item) {
                                 $dados[$atributo][$key] = $strategy->atributoToColmap($item);
                             }
@@ -743,7 +697,7 @@ class PgSqlPdoStrategy {
 
                     if (isset($propriedades['OneToMany'])) {
 
-                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
                         $id_atributo = $strategy->reflection->getAtributo($id_colmap);
 
                         foreach ($array[$atributo] as $key => $item) {
@@ -893,7 +847,7 @@ class PgSqlPdoStrategy {
 
                         if (isset($propriedades['OneToOne'])) {
 
-                            $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
+                            $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
 
                             $object = $strategy->obterPorId($array[$colmap], false);
 
@@ -918,7 +872,7 @@ class PgSqlPdoStrategy {
 
                 if (isset($propriedades['OneToMany'])) {
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
                     if (isset($propriedades['OneToMany']['coluna'])) {
                         $listObjeto = $strategy->listar("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
                     } else {
@@ -942,7 +896,8 @@ class PgSqlPdoStrategy {
                     }
 
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+
 
                     if (isset($propriedades['ManyToMany']['coluna'])) {
                         $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
@@ -981,7 +936,7 @@ class PgSqlPdoStrategy {
 
                 if (isset($propriedades['OneToMany'])) {
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
 
                     if (isset($propriedades['OneToMany']['coluna'])) {
                         $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
@@ -1005,7 +960,8 @@ class PgSqlPdoStrategy {
                     unset($strategy);
                 } elseif (isset($propriedades['ManyToMany'])) {
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+
 
                     if (isset($propriedades['ManyToMany']['coluna'])) {
                         $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
@@ -1074,7 +1030,7 @@ class PgSqlPdoStrategy {
 
                         if (isset($propriedades['OneToOne'])) {
 
-                            $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
+                            $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
 
                             $object = $strategy->obterPorIdUnFormatted($array[$colmap], false);
 
@@ -1093,7 +1049,7 @@ class PgSqlPdoStrategy {
 
                 if (isset($propriedades['OneToMany'])) {
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
 
                     if (isset($propriedades['OneToMany']['coluna'])) {
                         $listObjeto = $strategy->listarUnFormatted("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
@@ -1118,7 +1074,8 @@ class PgSqlPdoStrategy {
                     }
 
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+
 
                     if (isset($propriedades['ManyToMany']['coluna'])) {
                         $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
@@ -1156,7 +1113,7 @@ class PgSqlPdoStrategy {
 
                 if (isset($propriedades['OneToMany'])) {
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
 
                     if (isset($propriedades['OneToMany']['coluna'])) {
                         $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
@@ -1179,7 +1136,7 @@ class PgSqlPdoStrategy {
                     unset($strategy);
                 } elseif (isset($propriedades['ManyToMany'])) {
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
                     if (isset($propriedades['ManyToMany']['coluna'])) {
                         $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
@@ -1313,7 +1270,7 @@ class PgSqlPdoStrategy {
 
             $campos = implode(", ", array_keys($inserir['entity']));
             $values = ":" . implode(", :", array_keys($inserir['entity']));
-            $insert_query = "INSERT INTO {$this->tabela} ({$campos}) VALUES ({$values})";
+            $insert_query = "INSERT INTO {$this->tabela} ({$campos}) VALUES ({$values}) RETURNING {$id_colmap}";
 
             unset($campos);
             unset($values);
@@ -1322,7 +1279,7 @@ class PgSqlPdoStrategy {
 
                 foreach ($inserir['OneToMany'] as $atributo => $values) {
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($this->propAtributos[$atributo]['OneToMany']['objeto']));
+                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($this->propAtributos[$atributo]['OneToMany']['objeto']));
 
                     foreach ($values as $key => $row) {
 
@@ -1356,7 +1313,6 @@ class PgSqlPdoStrategy {
                     $relationship = $this->propAtributos[$atributo]['ManyToMany'];
                     $reflectionRelationship = new ReflectionORM($relationship['objeto']);
                     $id_relationship = $reflectionRelationship->getPropAnnotations('id', '@Colmap');
-
 
                     $insertManyToMany[$atributo]['@query'] = "INSERT INTO {$relationship['table']} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
 
@@ -1468,14 +1424,11 @@ class PgSqlPdoStrategy {
 
                         if (isset($dados[$atributo])) {
 
-                            $objLoadGetValue = $objectLoad->$getValue();
-
-                            if (isset($dados[$atributo][0])) {
+                            if (count($dados[$atributo]) > 0) {
 
                                 $flag = 0;
 
-                                if (isset($objLoadGetValue[0])) {
-                                    unset($objLoadGetValue);
+                                if (count($objectLoad->$getValue()) > 0) {
 
                                     if (count($objectLoad->$getValue()) != count($dados[$atributo])) {
                                         $flag++;
@@ -1504,8 +1457,7 @@ class PgSqlPdoStrategy {
 
                                 unset($flag);
                             } else {
-                                if (isset($objLoadGetValue[0])) {
-                                    unset($objLoadGetValue);
+                                if (count($objectLoad->$getValue()) > 0) {
                                     $collection[$atributo] = array();
                                 }
                             }
@@ -1611,13 +1563,14 @@ class PgSqlPdoStrategy {
                     # verificar exception e definir where do delete
                     $deleteException = (isset($exception['delete'][$atributo])) ? "AND " . $exception['delete'][$atributo] : "";
 
-
                     $collection[$atributo]['@query']['delete'] = "DELETE FROM {$relationship->table} WHERE {$id_colmap} = :{$id_colmap} {$deleteException}";
 
                     unset($deleteException);
 
                     if (count($update['collection'][$atributo]) > 0) {
+
                         $collection[$atributo]['@query']['insert'] = "INSERT INTO {$relationship->table} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+
                         foreach ($campos as $value) {
                             $collection[$atributo][$id_relationship][] = $value;
                         }
@@ -1666,7 +1619,7 @@ class PgSqlPdoStrategy {
                     foreach ($collection[$atrib] as $atributo => $array) {
 
                         if ($atributo != "@query") {
-                            if (isset($array[0])) {
+                            if (count($array) > 0) {
 
                                 $prepare = $this->conn->prepare($collection[$atrib]['@query']['insert']);
 
