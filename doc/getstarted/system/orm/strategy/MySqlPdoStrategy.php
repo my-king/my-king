@@ -1310,7 +1310,7 @@ class MySqlPdoStrategy {
 
             $campos = implode(", ", array_keys($inserir['entity']));
             $values = ":" . implode(", :", array_keys($inserir['entity']));
-            $insert_query = "INSERT INTO {$this->tabela} ({$campos}) VALUES ({$values}) RETURNING {$id_colmap}";
+            $insert_query = "INSERT INTO {$this->tabela} ({$campos}) VALUES ({$values})";
 
             unset($campos);
             unset($values);
