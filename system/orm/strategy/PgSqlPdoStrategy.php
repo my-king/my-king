@@ -524,7 +524,6 @@ class PgSqlPdoStrategy {
                                 unset($objectGetValue);
                                 $dados[$atributo] = $object->$getValue();
                             }
-                            
                         }
                     } else {
                         $dados[$atributo] = $object->$getValue();
@@ -927,40 +926,31 @@ class PgSqlPdoStrategy {
         $id_colmap = $this->propAtributos['id']['Colmap'];
 
         foreach ($this->propAtributos as $atributo => $propriedades) {
+            
+            $selectLoad = true;
+            $exceptionObject = null;
 
-            $colmap = (isset($propriedades['Colmap'])) ? $propriedades['Colmap'] : false;
-            $setValue = 'set' . ucfirst($atributo);
+            if (isset($exception['load'][$atributo])) {
+                if ($exception['load'][$atributo] === false) {
+                    $selectLoad = false;
+                } else {
+                    $exceptionObject['load'] = $exception['load'][$atributo];
+                }
+            }
 
-            # Se exite uma referencia do Colmap no atributo
-            if ($colmap !== false) {
+            if ($selectLoad) {
+                
+                $colmap = (isset($propriedades['Colmap'])) ? $propriedades['Colmap'] : false;
+                $setValue = 'set' . ucfirst($atributo);
 
-                # Se existe um colmap e ele é diferente de '' e null
-                if (isset($array[$colmap]) && $array[$colmap] !== '' && $array[$colmap] !== null) {
+                # Se exite uma referencia do Colmap no atributo
+                if ($colmap !== false) {
 
-                    if ($objectCollection === null || $objectCollection === false) {
+                    # Se existe um colmap e ele é diferente de '' e null
+                    if (isset($array[$colmap]) && $array[$colmap] !== '' && $array[$colmap] !== null) {
 
-                        if (isset($propriedades['Mask'])) {
-                            $mask = $propriedades['Mask'];
-                            $objeto->$setValue(MaskORM::$mask($array[$colmap]));
-                            unset($mask);
-                        } else {
-                            $objeto->$setValue($array[$colmap]);
-                        }
-                    } elseif ($objectCollection === true) {
+                        if ($objectCollection === null || $objectCollection === false) {
 
-                        if (isset($propriedades['OneToOne'])) {
-
-                            $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
-
-                            $object = $strategy->obterPorId($array[$colmap], false);
-
-                            if (is_object($object)) {
-                                $objeto->$setValue($object);
-                            }
-
-                            unset($object);
-                            unset($strategy);
-                        } else {
                             if (isset($propriedades['Mask'])) {
                                 $mask = $propriedades['Mask'];
                                 $objeto->$setValue(MaskORM::$mask($array[$colmap]));
@@ -968,144 +958,167 @@ class PgSqlPdoStrategy {
                             } else {
                                 $objeto->$setValue($array[$colmap]);
                             }
-                        }
-                    }
-                }
-            } elseif ($objectCollection === true) {
+                        } elseif ($objectCollection === true) {
 
-                if (isset($propriedades['OneToMany'])) {
+                            if (isset($propriedades['OneToOne'])) {
 
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
-                    if (isset($propriedades['OneToMany']['coluna'])) {
-                        $listObjeto = $strategy->listar("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
-                    } else {
-                        $listObjeto = $strategy->listar("{$id_colmap} = '{$objeto->getId()}'", null, false, $exception);
-                    }
+                                $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
 
-                    if ($listObjeto != false) {
-                        $objeto->$setValue($listObjeto);
-                    }
+                                $object = $strategy->obterPorId($array[$colmap], false, $exceptionObject);
 
-                    unset($strategy);
-                    unset($listObjeto);
-                } elseif (isset($propriedades['ManyToMany'])) {
+                                if (is_object($object)) {
+                                    $objeto->$setValue($object);
+                                }
 
-                    $selectException = "";
-
-                    if ($exception !== null) {
-                        if (isset($exception['select'][$atributo])) {
-                            $selectException = "AND " . $exception['select'][$atributo];
-                        }
-                    }
-
-
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
-
-                    if (isset($propriedades['ManyToMany']['schema'])) {
-                        if (isset($propriedades['ManyToMany']['coluna'])) {
-                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
-                        } else {
-                            $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
-                        }
-                    } else {
-                        if (isset($propriedades['ManyToMany']['coluna'])) {
-                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
-                        } else {
-                            $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
-                        }
-                    }
-                    unset($selectException);
-
-                    $result = $this->selectAll($query);
-
-                    unset($query);
-
-                    if ($result !== false) {
-
-                        $collection = array();
-                        if (isset($propriedades['ManyToMany']['coluna'])) {
-                            foreach ($result as $array) {
-                                $collection[] = $strategy->obterPorId($array[$propriedades['ManyToMany']['coluna']], false);
+                                unset($object);
+                                unset($strategy);
+                            } else {
+                                if (isset($propriedades['Mask'])) {
+                                    $mask = $propriedades['Mask'];
+                                    $objeto->$setValue(MaskORM::$mask($array[$colmap]));
+                                    unset($mask);
+                                } else {
+                                    $objeto->$setValue($array[$colmap]);
+                                }
                             }
+                        }
+                    }
+                } elseif ($objectCollection === true) {
+
+                    if (isset($propriedades['OneToMany'])) {
+
+                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                        if (isset($propriedades['OneToMany']['coluna'])) {
+                            $listObjeto = $strategy->listar("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
                         } else {
-                            foreach ($result as $array) {
-                                $collection[] = $strategy->obterPorId($array[$strategy->getIdColmap()], false);
+                            $listObjeto = $strategy->listar("{$id_colmap} = '{$objeto->getId()}'", null, false, $exception);
+                        }
+
+                        if ($listObjeto != false) {
+                            $objeto->$setValue($listObjeto);
+                        }
+
+                        unset($strategy);
+                        unset($listObjeto);
+                    } elseif (isset($propriedades['ManyToMany'])) {
+
+                        $selectException = "";
+
+                        if ($exception !== null) {
+                            if (isset($exception['select'][$atributo])) {
+                                $selectException = "AND " . $exception['select'][$atributo];
                             }
                         }
 
-                        $objeto->$setValue($collection);
 
-                        unset($collection);
-                    }
+                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
-                    unset($strategy);
-                    unset($result);
-                }
-            } elseif ($objectCollection === false) {
-
-                if (isset($propriedades['OneToMany'])) {
-
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
-
-                    if (isset($propriedades['OneToMany']['coluna'])) {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
-                    } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$id_colmap} = '{$objeto->getId()}'";
-                    }
-
-                    $listObjeto = $this->selectAll($query);
-                    unset($query);
-                    if ($listObjeto !== false) {
-                        $arrayCollection = array();
-
-                        foreach ($listObjeto as $ObjValue) {
-                            $arrayCollection[] = $ObjValue[$strategy->getIdColmap()];
-                        }
-
-                        $objeto->$setValue($arrayCollection);
-                        unset($arrayCollection);
-                    }
-                    unset($listObjeto);
-                    unset($strategy);
-                } elseif (isset($propriedades['ManyToMany'])) {
-
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
-
-                    if (isset($propriedades['ManyToMany']['schema'])) {
-                        if (isset($propriedades['ManyToMany']['coluna'])) {
-                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
-                        } else {
-                            $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
-                        }
-                    } else {
-                        if (isset($propriedades['ManyToMany']['coluna'])) {
-                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
-                        } else {
-                            $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
-                        }
-                    }
-                    $result = $this->selectAll($query);
-                    unset($query);
-
-                    if ($result !== false) {
-
-                        $collection = array();
-
-                        if (isset($propriedades['ManyToMany']['coluna'])) {
-                            foreach ($result as $array) {
-                                $collection[] = $array[$propriedades['ManyToMany']['coluna']];
+                        if (isset($propriedades['ManyToMany']['schema'])) {
+                            if (isset($propriedades['ManyToMany']['coluna'])) {
+                                $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                            } else {
+                                $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
                             }
                         } else {
-                            foreach ($result as $array) {
-                                $collection[] = $array[$strategy->getIdColmap()];
+                            if (isset($propriedades['ManyToMany']['coluna'])) {
+                                $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
+                            } else {
+                                $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
                             }
                         }
-                        $objeto->$setValue($collection);
-                        unset($collection);
-                    }
+                        unset($selectException);
 
-                    unset($result);
-                    unset($strategy);
+                        $result = $this->selectAll($query);
+
+                        unset($query);
+
+                        if ($result !== false) {
+
+                            $collection = array();
+                            if (isset($propriedades['ManyToMany']['coluna'])) {
+                                foreach ($result as $array) {
+                                    $collection[] = $strategy->obterPorId($array[$propriedades['ManyToMany']['coluna']], false, $exceptionObject);
+                                }
+                            } else {
+                                foreach ($result as $array) {
+                                    $collection[] = $strategy->obterPorId($array[$strategy->getIdColmap()], false, $exceptionObject);
+                                }
+                            }
+
+                            $objeto->$setValue($collection);
+
+                            unset($collection);
+                        }
+
+                        unset($strategy);
+                        unset($result);
+                    }
+                } elseif ($objectCollection === false) {
+
+                    if (isset($propriedades['OneToMany'])) {
+
+                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+
+                        if (isset($propriedades['OneToMany']['coluna'])) {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$id_colmap} = '{$objeto->getId()}'";
+                        }
+
+                        $listObjeto = $this->selectAll($query);
+                        unset($query);
+                        if ($listObjeto !== false) {
+                            $arrayCollection = array();
+
+                            foreach ($listObjeto as $ObjValue) {
+                                $arrayCollection[] = $ObjValue[$strategy->getIdColmap()];
+                            }
+
+                            $objeto->$setValue($arrayCollection);
+                            unset($arrayCollection);
+                        }
+                        unset($listObjeto);
+                        unset($strategy);
+                    } elseif (isset($propriedades['ManyToMany'])) {
+
+                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+
+                        if (isset($propriedades['ManyToMany']['schema'])) {
+                            if (isset($propriedades['ManyToMany']['coluna'])) {
+                                $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                            } else {
+                                $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                            }
+                        } else {
+                            if (isset($propriedades['ManyToMany']['coluna'])) {
+                                $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                            } else {
+                                $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                            }
+                        }
+                        $result = $this->selectAll($query);
+                        unset($query);
+
+                        if ($result !== false) {
+
+                            $collection = array();
+
+                            if (isset($propriedades['ManyToMany']['coluna'])) {
+                                foreach ($result as $array) {
+                                    $collection[] = $array[$propriedades['ManyToMany']['coluna']];
+                                }
+                            } else {
+                                foreach ($result as $array) {
+                                    $collection[] = $array[$strategy->getIdColmap()];
+                                }
+                            }
+                            $objeto->$setValue($collection);
+                            unset($collection);
+                        }
+
+                        unset($result);
+                        unset($strategy);
+                    }
                 }
             }
         }
@@ -1561,7 +1574,7 @@ class PgSqlPdoStrategy {
 
                             $objLoadGetValue = $objectLoad->$getValue();
 
-                            if ( isset($dados[$atributo][0]) ) {
+                            if (isset($dados[$atributo][0])) {
 
                                 $flag = 0;
 

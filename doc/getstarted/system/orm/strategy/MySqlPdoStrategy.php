@@ -678,7 +678,6 @@ class MySqlPdoStrategy {
 
             # Finalizar transação
             $this->conn->commit();
-            
         } catch (Exception $e) {
             $this->conn->rollBack();
             LogErroORM::gerarLogDelete($e->getMessage(), $query, $dados);
@@ -865,39 +864,30 @@ class MySqlPdoStrategy {
 
         foreach ($this->propAtributos as $atributo => $propriedades) {
 
-            $colmap = (isset($propriedades['Colmap'])) ? $propriedades['Colmap'] : false;
-            $setValue = 'set' . ucfirst($atributo);
+            $selectLoad = true;
+            $exceptionObject = null;
 
-            # Se exite uma referencia do Colmap no atributo
-            if ($colmap !== false) {
+            if (isset($exception['load'][$atributo])) {
+                if ($exception['load'][$atributo] === false) {
+                    $selectLoad = false;
+                } else {
+                    $exceptionObject['load'] = $exception['load'][$atributo];
+                }
+            }
 
-                # Se existe um colmap e ele é diferente de '' e null
-                if (isset($array[$colmap]) && $array[$colmap] !== '' && $array[$colmap] !== null) {
+            if ($selectLoad) {
 
-                    if ($objectCollection === null || $objectCollection === false) {
+                $colmap = (isset($propriedades['Colmap'])) ? $propriedades['Colmap'] : false;
+                $setValue = 'set' . ucfirst($atributo);
 
-                        if (isset($propriedades['Mask'])) {
-                            $mask = $propriedades['Mask'];
-                            $objeto->$setValue(MaskORM::$mask($array[$colmap]));
-                            unset($mask);
-                        } else {
-                            $objeto->$setValue($array[$colmap]);
-                        }
-                    } elseif ($objectCollection === true) {
+                # Se exite uma referencia do Colmap no atributo
+                if ($colmap !== false) {
 
-                        if (isset($propriedades['OneToOne'])) {
+                    # Se existe um colmap e ele é diferente de '' e null
+                    if (isset($array[$colmap]) && $array[$colmap] !== '' && $array[$colmap] !== null) {
 
-                            $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
+                        if ($objectCollection === null || $objectCollection === false) {
 
-                            $object = $strategy->obterPorId($array[$colmap], false);
-
-                            if (is_object($object)) {
-                                $objeto->$setValue($object);
-                            }
-
-                            unset($object);
-                            unset($strategy);
-                        } else {
                             if (isset($propriedades['Mask'])) {
                                 $mask = $propriedades['Mask'];
                                 $objeto->$setValue(MaskORM::$mask($array[$colmap]));
@@ -905,132 +895,155 @@ class MySqlPdoStrategy {
                             } else {
                                 $objeto->$setValue($array[$colmap]);
                             }
-                        }
-                    }
-                }
-            } elseif ($objectCollection === true) {
+                        } elseif ($objectCollection === true) {
 
-                if (isset($propriedades['OneToMany'])) {
+                            if (isset($propriedades['OneToOne'])) {
 
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
-                    if (isset($propriedades['OneToMany']['coluna'])) {
-                        $listObjeto = $strategy->listar("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
-                    } else {
-                        $listObjeto = $strategy->listar("{$id_colmap} = '{$objeto->getId()}'", null, false, $exception);
-                    }
+                                $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
 
-                    if ($listObjeto != false) {
-                        $objeto->$setValue($listObjeto);
-                    }
+                                $object = $strategy->obterPorId($array[$colmap], false, $exceptionObject);
 
-                    unset($strategy);
-                    unset($listObjeto);
-                } elseif (isset($propriedades['ManyToMany'])) {
+                                if (is_object($object)) {
+                                    $objeto->$setValue($object);
+                                }
 
-                    $selectException = "";
-
-                    if ($exception !== null) {
-                        if (isset($exception['select'][$atributo])) {
-                            $selectException = "AND " . $exception['select'][$atributo];
-                        }
-                    }
-
-
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
-
-
-                    if (isset($propriedades['ManyToMany']['coluna'])) {
-                        $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
-                    } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
-                    }
-
-                    unset($selectException);
-
-                    $result = $this->selectAll($query);
-
-                    unset($query);
-
-                    if ($result !== false) {
-
-                        $collection = array();
-                        if (isset($propriedades['ManyToMany']['coluna'])) {
-                            foreach ($result as $array) {
-                                $collection[] = $strategy->obterPorId($array[$propriedades['ManyToMany']['coluna']], false);
+                                unset($object);
+                                unset($strategy);
+                            } else {
+                                if (isset($propriedades['Mask'])) {
+                                    $mask = $propriedades['Mask'];
+                                    $objeto->$setValue(MaskORM::$mask($array[$colmap]));
+                                    unset($mask);
+                                } else {
+                                    $objeto->$setValue($array[$colmap]);
+                                }
                             }
+                        }
+                    }
+                } elseif ($objectCollection === true) {
+
+                    if (isset($propriedades['OneToMany'])) {
+
+                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                        if (isset($propriedades['OneToMany']['coluna'])) {
+                            $listObjeto = $strategy->listar("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
                         } else {
-                            foreach ($result as $array) {
-                                $collection[] = $strategy->obterPorId($array[$strategy->getIdColmap()], false);
+                            $listObjeto = $strategy->listar("{$id_colmap} = '{$objeto->getId()}'", null, false, $exception);
+                        }
+
+                        if ($listObjeto != false) {
+                            $objeto->$setValue($listObjeto);
+                        }
+
+                        unset($strategy);
+                        unset($listObjeto);
+                    } elseif (isset($propriedades['ManyToMany'])) {
+
+                        $selectException = "";
+
+                        if ($exception !== null) {
+                            if (isset($exception['select'][$atributo])) {
+                                $selectException = "AND " . $exception['select'][$atributo];
                             }
                         }
 
-                        $objeto->$setValue($collection);
 
-                        unset($collection);
-                    }
+                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
-                    unset($strategy);
-                    unset($result);
-                }
-            } elseif ($objectCollection === false) {
-
-                if (isset($propriedades['OneToMany'])) {
-
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
-
-                    if (isset($propriedades['OneToMany']['coluna'])) {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
-                    } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$id_colmap} = '{$objeto->getId()}'";
-                    }
-
-                    $listObjeto = $this->selectAll($query);
-                    unset($query);
-                    if ($listObjeto !== false) {
-                        $arrayCollection = array();
-
-                        foreach ($listObjeto as $ObjValue) {
-                            $arrayCollection[] = $ObjValue[$strategy->getIdColmap()];
-                        }
-
-                        $objeto->$setValue($arrayCollection);
-                        unset($arrayCollection);
-                    }
-                    unset($listObjeto);
-                    unset($strategy);
-                } elseif (isset($propriedades['ManyToMany'])) {
-
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
-
-
-                    if (isset($propriedades['ManyToMany']['coluna'])) {
-                        $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
-                    } else {
-                        $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
-                    }
-
-                    $result = $this->selectAll($query);
-                    unset($query);
-
-                    if ($result !== false) {
-
-                        $collection = array();
 
                         if (isset($propriedades['ManyToMany']['coluna'])) {
-                            foreach ($result as $array) {
-                                $collection[] = $array[$propriedades['ManyToMany']['coluna']];
-                            }
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
                         } else {
-                            foreach ($result as $array) {
-                                $collection[] = $array[$strategy->getIdColmap()];
-                            }
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
                         }
-                        $objeto->$setValue($collection);
-                        unset($collection);
-                    }
 
-                    unset($result);
-                    unset($strategy);
+                        unset($selectException);
+
+                        $result = $this->selectAll($query);
+
+                        unset($query);
+
+                        if ($result !== false) {
+
+                            $collection = array();
+                            if (isset($propriedades['ManyToMany']['coluna'])) {
+                                foreach ($result as $array) {
+                                    $collection[] = $strategy->obterPorId($array[$propriedades['ManyToMany']['coluna']], false, $exceptionObject);
+                                }
+                            } else {
+                                foreach ($result as $array) {
+                                    $collection[] = $strategy->obterPorId($array[$strategy->getIdColmap()], false, $exceptionObject);
+                                }
+                            }
+
+                            $objeto->$setValue($collection);
+
+                            unset($collection);
+                        }
+
+                        unset($strategy);
+                        unset($result);
+                    }
+                } elseif ($objectCollection === false) {
+
+                    if (isset($propriedades['OneToMany'])) {
+
+                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+
+                        if (isset($propriedades['OneToMany']['coluna'])) {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$id_colmap} = '{$objeto->getId()}'";
+                        }
+
+                        $listObjeto = $this->selectAll($query);
+                        unset($query);
+                        if ($listObjeto !== false) {
+                            $arrayCollection = array();
+
+                            foreach ($listObjeto as $ObjValue) {
+                                $arrayCollection[] = $ObjValue[$strategy->getIdColmap()];
+                            }
+
+                            $objeto->$setValue($arrayCollection);
+                            unset($arrayCollection);
+                        }
+                        unset($listObjeto);
+                        unset($strategy);
+                    } elseif (isset($propriedades['ManyToMany'])) {
+
+                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+
+
+                        if (isset($propriedades['ManyToMany']['coluna'])) {
+                            $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        } else {
+                            $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                        }
+
+                        $result = $this->selectAll($query);
+                        unset($query);
+
+                        if ($result !== false) {
+
+                            $collection = array();
+
+                            if (isset($propriedades['ManyToMany']['coluna'])) {
+                                foreach ($result as $array) {
+                                    $collection[] = $array[$propriedades['ManyToMany']['coluna']];
+                                }
+                            } else {
+                                foreach ($result as $array) {
+                                    $collection[] = $array[$strategy->getIdColmap()];
+                                }
+                            }
+                            $objeto->$setValue($collection);
+                            unset($collection);
+                        }
+
+                        unset($result);
+                        unset($strategy);
+                    }
                 }
             }
         }
@@ -1464,14 +1477,14 @@ class MySqlPdoStrategy {
                     } elseif (isset($propriedades['ManyToMany'])) {
 
                         if (isset($dados[$atributo])) {
-                            
+
                             $objLoadGetValue = $objectLoad->$getValue();
 
                             if (isset($dados[$atributo][0])) {
 
                                 $flag = 0;
 
-                                if ( isset($objLoadGetValue[0]) ) {
+                                if (isset($objLoadGetValue[0])) {
 
                                     if (count($objLoadGetValue) != count($dados[$atributo])) {
                                         $flag++;
@@ -1500,12 +1513,11 @@ class MySqlPdoStrategy {
 
                                 unset($flag);
                             } else {
-                                if ( isset($objLoadGetValue[0]) ) {
+                                if (isset($objLoadGetValue[0])) {
                                     $collection[$atributo] = array();
                                 }
                             }
                             unset($objLoadGetValue);
-                            
                         }
                     }
                 } else { // se colmap não for false
