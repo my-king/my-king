@@ -2,7 +2,7 @@
 
 class ReflectionORM extends ReflectionClass {
 
-    private $class;
+    private $nameClass;
     private $atributos;
     private $propAtributos = array();
     private $classAnnotations = array();
@@ -13,19 +13,21 @@ class ReflectionORM extends ReflectionClass {
     private $regex4 = "@[\w]+";
 
     public function __construct($class) {
+
         parent::__construct($class);
-        $this->class = $class;
+
+        $this->nameClass = $class;
         $this->extractDocAnnotations();
         $this->extractAtributos();
         $this->extractPropAtributos();
     }
 
     public function getObjClass() {
-        return new $this->class();
+        return new $this->nameClass();
     }
 
     public function getClass() {
-        return $this->class;
+        return $this->nameClass;
     }
 
     public function getColmap() {
@@ -145,7 +147,7 @@ class ReflectionORM extends ReflectionClass {
                 # Adicionar campo mask ao mapeamento
                 $mask = $this->getPropAnnotations($atributo, '@Mask');
                 if ($mask !== false) {
-                    $mapAtributo[$atributo]['Mask'] = trim($mask);
+                    $mapAtributo[$atributo]['Mask'] = $mask;
                 }
                 # limpar memoria
                 unset($mask);
@@ -159,7 +161,6 @@ class ReflectionORM extends ReflectionClass {
                         if (isset($relationship->coluna)) {
                             $mapAtributo[$atributo]['OneToMany']['coluna'] = $relationship->coluna;
                         }
-                        
                     } elseif ($relationship->type === 'ManyToMany') {
 
                         $mapAtributo[$atributo]['ManyToMany']['objeto'] = $relationship->objeto;
@@ -212,13 +213,14 @@ class ReflectionORM extends ReflectionClass {
         }
 
         $properties = $this->getProperties();
+
         foreach ($properties as $prop) {
             $this->extractPropAnnotations($prop->name);
         }
     }
 
     private function extractPropAnnotations($property) {
-        $ref = new ReflectionProperty($this->class, $property);
+        $ref = new ReflectionProperty($this->nameClass, $property);
 
         $this->propAnnotations[$property] = array();
 
@@ -264,7 +266,7 @@ class ReflectionORM extends ReflectionClass {
 
     private function parseRegex1($annotation) {
         return preg_replace(
-                        '/@[\w]+=/', '', preg_replace('/[ ]{0,1}=[ ]{0,1}/', '=', $annotation)
+                '/@[\w]+=/', '', preg_replace('/[ ]{0,1}=[ ]{0,1}/', '=', $annotation)
         );
     }
 
