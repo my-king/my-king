@@ -1,8 +1,0 @@
-# ACESSO NÃO AUTORIZADO - ERRO 401
-ErrorDocument 401 /acomp/index.php?Errors/HTTP_401
-# ACESSO NEGADO - ERRO 403 
-ErrorDocument 403 /acomp/index.php?Errors/HTTP_403
-# PAGINA NÃO EXISTE - ERRO 404
-ErrorDocument 404 /acomp/index.php?Errors/HTTP_404
-# ERRO INTERNO DO SERVIDOR - ERRO 500
-ErrorDocument 500 /acomp/index.php?Errors/HTTP_500

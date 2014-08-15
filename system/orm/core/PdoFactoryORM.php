@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Description of MySqlDBO
- *
- * @author igor
- */
 abstract class PdoFactoryORM extends AbstractFactoryORM {
 
     public $conn = null;
@@ -37,7 +32,7 @@ abstract class PdoFactoryORM extends AbstractFactoryORM {
                                 "{$this->user}", //usuario
                                 "{$this->password}", // Senha
                                 array(
-                                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES latin1", //Força UTF8
+                                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES latin1", //Forï¿½a UTF8
                                     PDO::ATTR_PERSISTENT => true // Persistir a conexao
                                 )
                 );
@@ -45,18 +40,14 @@ abstract class PdoFactoryORM extends AbstractFactoryORM {
                 return $this->conn;
                 
             } else {
-                LogErroORM::gerarLog("CONEXAO - NÃO FOI POSSIVEL CONNECTAR O 'type' ESPECIFICADO NA CONFIGURAÇÃO NÃO EXISTE OU É NULO", $e->getMessage());
-                $redirecionamento = new RedirectorHelper();
-                $redirecionamento->goToControllerAction("Errors", "database");
+                LogErroORM::gerarLog("CONEXAO - Nï¿½O FOI POSSIVEL CONNECTAR O 'type' ESPECIFICADO NA CONFIGURAï¿½ï¿½O Nï¿½O EXISTE OU ï¿½ NULO", $e->getMessage());
+                RedirectorHelper::goToControllerAction("Errors", "database");
             }
             
         } catch (Exception $e) {
-            LogErroORM::gerarLog("CONEXAO - NÃO FOI POSSIVEL ESTABELECER UMA CONEXÃO COM O SERVIDOR", $e->getMessage());
-            $redirecionamento = new RedirectorHelper();
-            $redirecionamento->goToControllerAction("Errors", "database");
+            LogErroORM::gerarLog("CONEXAO - Nï¿½O FOI POSSIVEL ESTABELECER UMA CONEXï¿½O COM O SERVIDOR", $e->getMessage());
+            RedirectorHelper::goToControllerAction("Errors", "database");
         }
     }
 
 }
-
-?>

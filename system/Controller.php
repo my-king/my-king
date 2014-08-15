@@ -2,12 +2,10 @@
 
 class Controller extends System {
 
-    public $REDIRECT;
     private $DADOS;
 
     public function __construct() {
         parent::__construct();
-        $this->REDIRECT = new RedirectorHelper();
         $this->DADOS = null;
     }
 
@@ -25,7 +23,7 @@ class Controller extends System {
         $path = VIEWS . $this->_controller . "/" . $nome . '.phtml';
 
         if (!file_exists($path)) {
-            $this->REDIRECT->goToControllerAction("Errors", "VIEW_404");
+            RedirectorHelper::goToControllerAction("Errors", "VIEW_404");
         }
 
         return require_once ( $path );
@@ -39,7 +37,7 @@ class Controller extends System {
         $path = VIEWS . "core/" . $nome . '.phtml';
 
         if (!file_exists($path)) {
-            $this->REDIRECT->goToControllerAction("Errors", "VIEW_404");
+            RedirectorHelper::goToControllerAction("Errors", "VIEW_404");
         }
 
         return require_once ( $path );

@@ -22,7 +22,20 @@ class PgSqlPdoStrategy {
         return $this->tabela;
     }
 
-    public function getColunas() {
+    public function getColunas(Array $exceptionLoad = null) {
+        if (count($exceptionLoad) > 0) {
+            $colunas = explode(',', $this->colunas);
+            foreach ($exceptionLoad as $atributo => $value) {
+                if ($value === false && isset($this->propAtributos[$atributo]['Colmap'])) {
+                    $key = array_search($this->propAtributos[$atributo]['Colmap'], $colunas);
+                    if ($key !== false) {
+                        unset($colunas[$key]);
+                    }
+                }
+            }
+            return implode(',', $colunas);
+        }
+
         return $this->colunas;
     }
 
@@ -249,17 +262,21 @@ class PgSqlPdoStrategy {
      * @param type $objectCollection
      * @return boolean
      */
-    public function obter($where, $objectCollection = null) {
+    public function obter($where, $objectCollection = null, $exception = null) {
 
         $where = "WHERE {$where}";
-        $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} $where";
+        if (isset($exception['load'])) {
+            $query = "SELECT {$this->getColunas($exception['load'])} FROM {$this->schema}.{$this->tabela} $where";
+        } else {
+            $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} $where";
+        }
         $result = $this->select($query);
 
         if (!$result) {
             return false;
         }
 
-        return $this->loadObject($result, $objectCollection);
+        return $this->loadObject($result, $objectCollection, $exception);
     }
 
     /**
@@ -273,8 +290,14 @@ class PgSqlPdoStrategy {
         # Pegar colmap do id
         $ide_colmap = $this->propAtributos['id']['Colmap'];
 
+        $AND = (isset($exception['and'])) ? 'AND ' . $exception['and'] : '';
+
         # cria query
-        $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} WHERE {$ide_colmap} = :id";
+        if (isset($exception['load'])) {
+            $query = "SELECT {$this->getColunas($exception['load'])} FROM {$this->schema}.{$this->tabela} WHERE {$ide_colmap} = :id {$AND}";
+        } else {
+            $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} WHERE {$ide_colmap} = :id {$AND}";
+        }
 
         # Executar query
         $dados['id'] = $id;
@@ -312,9 +335,11 @@ class PgSqlPdoStrategy {
      * @param type $objectCollection
      * @return boolean
      */
-    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null) {
+    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null, $limit = null) {
 
-        $offset = ($offset !== null) ? 'LIMIT ' . LIMIT . ' OFFSET ' . $offset : '';
+        $limit = ($limit !== null) ? $limit : LIMIT;
+        $offset = ($offset !== null) ? 'LIMIT ' . $limit . ' OFFSET ' . $offset : '';
+
         if ($where != null) {
             $where = "WHERE {$where}";
 
@@ -328,8 +353,12 @@ class PgSqlPdoStrategy {
         }
 
         $orderby = $this->getOrderby($orderby);
+        if (isset($exception['load'])) {
+            $query = "SELECT {$this->getColunas($exception['load'])} FROM {$this->schema}.{$this->tabela} {$where} {$orderby} {$offset}";
+        } else {
+            $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} {$where} {$orderby} {$offset}";
+        }
 
-        $query = "SELECT {$this->colunas} FROM {$this->schema}.{$this->tabela} {$where} {$orderby} {$offset}";
         $result = $this->selectAll($query);
 
         if (!$result || count($result) == 0) {
@@ -639,6 +668,50 @@ class PgSqlPdoStrategy {
     }
 
     /**
+     * Executa query de delete de acordo as configurações
+     *  passadas ignorando o objeto instanciado, os dados são passado 
+     *  no formato de array onde o indice é o nome do campo no banco de dados
+     *  e value o valor buscado para o mesmo
+     * @example $dados['ide_qualquer'] = 1
+     * @param string $from
+     * @param string $where
+     * @param array $dados
+     * @return boolean
+     */
+    public function deleteQuery($from, $where, Array $dados = null) {
+
+        # Pegar colmap do id
+        $query = "DELETE FROM {$from} WHERE $where";
+
+        // Deletar intens da base de dados
+        try {
+
+            #iniciar transação
+            $this->conn->beginTransaction();
+
+            // Preparar query
+            $prepare = $this->conn->prepare($query);
+            if ($dados !== null) {
+                foreach ($dados as $key => $value) {
+                    $prepare->bindValue(":{$key}", $value);
+                }
+            }
+
+            # executar query
+            $prepare->execute();
+
+            # Finalizar transação
+            $this->conn->commit();
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            LogErroORM::gerarLogDelete($e->getMessage(), $query, $dados);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Deletar dados na base de dados
      * @param type $id
      * @return type
@@ -926,20 +999,19 @@ class PgSqlPdoStrategy {
         $id_colmap = $this->propAtributos['id']['Colmap'];
 
         foreach ($this->propAtributos as $atributo => $propriedades) {
-            
+
             $selectLoad = true;
             $exceptionObject = null;
 
             if (isset($exception['load'][$atributo])) {
                 if ($exception['load'][$atributo] === false) {
+                    unset($exception['load'][$atributo]);
                     $selectLoad = false;
                 } else {
                     $exceptionObject['load'] = $exception['load'][$atributo];
                 }
             }
-
             if ($selectLoad) {
-                
                 $colmap = (isset($propriedades['Colmap'])) ? $propriedades['Colmap'] : false;
                 $setValue = 'set' . ucfirst($atributo);
 
@@ -1009,7 +1081,6 @@ class PgSqlPdoStrategy {
                                 $selectException = "AND " . $exception['select'][$atributo];
                             }
                         }
-
 
                         $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
@@ -1081,21 +1152,29 @@ class PgSqlPdoStrategy {
                         unset($strategy);
                     } elseif (isset($propriedades['ManyToMany'])) {
 
+                        $selectException = "";
+                        if ($exception !== null) {
+                            if (isset($exception['select'][$atributo])) {
+                                $selectException = "AND " . $exception['select'][$atributo];
+                            }
+                        }
+
                         $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
 
                         if (isset($propriedades['ManyToMany']['schema'])) {
                             if (isset($propriedades['ManyToMany']['coluna'])) {
-                                $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                                $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()} {$selectException}";
                             } else {
-                                $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                                $query = "SELECT {$strategy->getIdColmap()} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()} {$selectException}";
                             }
                         } else {
                             if (isset($propriedades['ManyToMany']['coluna'])) {
-                                $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                                $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()} {$selectException}";
                             } else {
-                                $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
+                                $query = "SELECT {$strategy->getIdColmap()} FROM {$this->schema}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()} {$selectException}";
                             }
                         }
+                        unset($selectException);
                         $result = $this->selectAll($query);
                         unset($query);
 
@@ -1537,6 +1616,8 @@ class PgSqlPdoStrategy {
             // Gravar Log
             $dados = $inserir['entity'];
             $collection = (isset($insertManyToMany)) ? $insertManyToMany : null;
+
+            SatelliteHelper::gerarLogInsert($conn, $e->getMessage(), $insert_query, $dados, $collection);
             LogErroORM::gerarLogInsert($e->getMessage(), $insert_query, $dados, $collection);
             return $result;
         }
@@ -1728,13 +1809,21 @@ class PgSqlPdoStrategy {
 
                         # Verificar o schema
                         if (isset($relationship->schema)) {
-                            $collection[$atributo]['@query']['insert'] = "INSERT INTO {$relationship->schema}.{$relationship->table} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+                            if (isset($relationship->coluna)) {
+                                $collection[$atributo]['@query']['insert'] = "INSERT INTO {$relationship->schema}.{$relationship->table} ({$id_colmap},{$relationship->coluna}) VALUES (:{$id_colmap},:{$relationship->coluna})";
+                            } else {
+                                $collection[$atributo]['@query']['insert'] = "INSERT INTO {$relationship->schema}.{$relationship->table} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
+                            }
                         } else {
                             $collection[$atributo]['@query']['insert'] = "INSERT INTO {$this->schema}.{$relationship->table} ({$id_colmap},{$id_relationship}) VALUES (:{$id_colmap},:{$id_relationship})";
                         }
 
                         foreach ($campos as $value) {
-                            $collection[$atributo][$id_relationship][] = $value;
+                            if (isset($relationship->coluna)) {
+                                $collection[$atributo][$relationship->coluna][] = $value;
+                            }else{
+                                $collection[$atributo][$id_relationship][] = $value;
+                            }
                         }
                     } else {
                         $collection[$atributo][$id_relationship] = array();
@@ -1746,7 +1835,7 @@ class PgSqlPdoStrategy {
                 }
             }
         }
-
+        
         // Inserir na base de dados
         try {
 
