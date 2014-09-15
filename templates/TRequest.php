@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Template basico para requisições ajax
+ * Template basico para requisiÃ§Ãµes ajax
  * @author Igor da Hora <igordahora@gmail.com.br>
  */
 class TRequest extends Controller {

@@ -13,5 +13,3 @@ Path::getInstancia();
 // inicia a aplicação
 $start = new System();
 $start->run();
-
-?>

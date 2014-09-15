@@ -7,5 +7,3 @@ class IndexController extends TMetroUI{
     }
     
 }
-
-?>

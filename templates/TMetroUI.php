@@ -30,7 +30,7 @@ class TMetroUI extends Controller {
         $this->HTML->setIcon(PATH_TEMPLATE_IMAGE_URL . "favicon.ico");
 
         # Definir nome da pagina
-        $this->HTML->setTitle(strtoupper(NAME_SIS) . " - {$this->_controller}/{$this->_action}");
+        $this->HTML->setTitle(strtoupper(NAME_SIS) . " - {$this->getController()}/{$this->getAction()}");
 
         $this->HTML->addJavaScript(PATH_TEMPLATE_JS_URL . 'docs.js', true);
 
@@ -87,5 +87,3 @@ class TMetroUI extends Controller {
     }
 
 }
-
-?>

@@ -1,15 +1,30 @@
 <?php
 
-class Controller extends System {
+class Controller {
 
     private $DADOS;
 
     public function __construct() {
-        parent::__construct();
         $this->DADOS = null;
     }
 
     public function init() {}
+    
+    public function getController() {
+        return CurrentUrlHelper::getController();
+    }
+    
+    public function getAction() {
+        return CurrentUrlHelper::getAction();
+    }
+    
+    public function getParam($name = null) {
+        return CurrentUrlHelper::getParam($name);
+    }
+
+    public function isParam($name) {
+        return CurrentUrlHelper::isParam($name);
+    }
 
     public function addDados($name, $value) {
         $this->DADOS[$name] = $value;
@@ -20,7 +35,7 @@ class Controller extends System {
             extract($this->DADOS, EXTR_PREFIX_ALL, 'view');
         }
 
-        $path = VIEWS . $this->_controller . "/" . $nome . '.phtml';
+        $path = VIEWS . CurrentUrlHelper::getController() . "/" . $nome . '.phtml';
 
         if (!file_exists($path)) {
             RedirectorHelper::goToControllerAction("Errors", "VIEW_404");
@@ -44,5 +59,3 @@ class Controller extends System {
     }
 
 }
-
-?>
