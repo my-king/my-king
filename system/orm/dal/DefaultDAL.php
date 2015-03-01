@@ -12,15 +12,17 @@ class DefaultDAL extends PdoFactoryORM{
     }
 
     public function __clone() {
-        trigger_error('Clone não permitido.', E_USER_ERROR);
+        trigger_error('Clone nÃ£o permitido.', E_USER_ERROR);
     }
     
     
+    public function getNameDAL() {
+        return 'DefaultDAL';
+    }    
+
     public function getDadosConexao() {
         $ini = parse_ini_file('system/config/config.ini', true);
-        return $ini['DefaultDAL'];            
+        return $ini['DefaultDAL'];
     }    
     
 }
-
-?>

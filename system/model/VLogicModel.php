@@ -8,24 +8,24 @@ abstract class VLogicModel {
         $this->DAO = $objDao;
     }
 
-    public function obter($where, $objectCollection = null) {
-        return $this->DAO->obter($where, $objectCollection);
+    public function obter($where, $objectCollection = null, $exception = null) {
+        return $this->DAO->obter($where, $objectCollection, $exception);
     }
 
     public function obterPorId($id, $objectCollection = null, $exception = null) {
         return $this->DAO->obterPorId($id, $objectCollection, $exception);
     }
 
-    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null) {
-        return $this->DAO->listar($where, $orderby, $objectCollection, $exception, $offset);
+    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null, $limit = null) {
+        return $this->DAO->listar($where, $orderby, $objectCollection, $exception, $offset, $limit);
     }
 
     public function select($query, array $dados = null) {
-        return $this->DAO->select( $query , $dados );
+        return $this->DAO->select($query, $dados);
     }
 
     public function selectAll($query, array $dados = null) {
-        return $this->DAO->selectAll( $query , $dados );
+        return $this->DAO->selectAll($query, $dados);
     }
 
     public function objectToArray($object) {
@@ -44,9 +44,14 @@ abstract class VLogicModel {
         return $this->DAO->totalRegistro($where);
     }
 
-        public function somar($atributo, $where = null) {
+    public function somar($atributo, $where = null) {
         return $this->DAO->somar($atributo, $where);
     }
-}
+    public function maiorValor($atributo, $where = null) {
+        return $this->DAO->maiorValor($atributo, $where);
+    }
+    public function menorValor($atributo, $where = null) {
+        return $this->DAO->menorValor($atributo, $where);
+    }
 
-?>
+}

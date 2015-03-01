@@ -8,21 +8,25 @@ abstract class LogicModel {
         $this->DAO = $objDao;
     }    
     
-    public function obter($where, $objectCollection = null) {
-        return $this->DAO->obter($where, $objectCollection);
+    public function obter($where, $objectCollection = null, $exception = null) {
+        return $this->DAO->obter($where, $objectCollection, $exception);
     }
     
     public function obterPorId($id, $objectCollection = null, $exception = null) {
         return $this->DAO->obterPorId($id, $objectCollection, $exception);
     }
 
-    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null) {
-        return $this->DAO->listar($where, $orderby, $objectCollection, $exception, $offset);
+    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null, $limit = null) {
+        return $this->DAO->listar($where, $orderby, $objectCollection, $exception, $offset, $limit);
     }
 
     public function salvar($dados, $objectResult = null, $exception = null) {
         return $this->DAO->salvar($dados, $objectResult, $exception);
     }
+
+    public function deleteQuery($from, $where, Array $dados = null) {
+        return $this->DAO->deleteQuery($from, $where, $dados);
+    }    
 
     public function excluirPorId($id) {
         return $this->DAO->excluirPorId($id);
@@ -63,6 +67,10 @@ abstract class LogicModel {
     public function somar($atributo, $where = null) {
         return $this->DAO->somar($atributo, $where);
     }
+    public function maiorValor($atributo, $where = null) {
+        return $this->DAO->maiorValor($atributo, $where);
+    }
+    public function menorValor($atributo, $where = null) {
+        return $this->DAO->menorValor($atributo, $where);
+    }
 }
-
-?>

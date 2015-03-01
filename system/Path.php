@@ -69,8 +69,11 @@ class Path {
             # PATH URL
             $PATH_URL = $this->PATH_URL . ROOT;
         }
-
-        // PATH
+        
+        /* LIMITE DE DADOS POR PAGINA */
+        define('LIMIT', $config['paginacao']['limit']);
+        
+        /* PATH */
         define('PATH', $PATH);
         define('PATH_SYSTEM', PATH . "system/");
         define('PATH_APP', PATH . APP);
@@ -96,5 +99,3 @@ class Path {
     }
 
 }
-
-?>

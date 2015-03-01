@@ -21,6 +21,8 @@ function __autoload($class) {
         $dir = PATH . "system/model/";
     } elseif (preg_match("/ORM$/", $class)) {
         $dir = PATH . "system/orm/core/";
+    } elseif (preg_match("/Drive$/", $class)) {
+        $dir = PATH . "system/orm/drive/";
     } elseif (preg_match("/DAL$/", $class)) {
         $dir = PATH . "system/orm/dal/";
     } elseif (preg_match("/Strategy$/", $class)) {

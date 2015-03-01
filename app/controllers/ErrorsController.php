@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Controller direcionado visualização de erros
- * ocasionados durante execução do sistema
+ * Controller direcionado visualizaï¿½ï¿½o de erros
+ * ocasionados durante execuï¿½ï¿½o do sistema
  * @author igor
  */
 class ErrorsController extends TErrors {
@@ -13,12 +13,12 @@ class ErrorsController extends TErrors {
     }
 
     public function index() {
-        $this->addDados('erro', 'Ocorreu um erro, isso é constrangedor!!!');
+        $this->addDados('erro', 'Ocorreu um erro, isso Ã© constrangedor!!!');
         $this->TErro("erro");
     }
 
     public function HTTP_401() {
-        $this->addDados('erro', 'ERRO 401 - PAGINA NÃO EXISTE!!!');
+        $this->addDados('erro', 'ERRO 401 - PAGINA NÃƒO EXISTE!!!');
         $this->TErro("erro");
     }
 
@@ -29,12 +29,12 @@ class ErrorsController extends TErrors {
     }
 
     public function HTTP_404() {
-        $this->addDados('erro', 'ERRO 404 - PAGINA NÃO EXISTE!!!');
+        $this->addDados('erro', 'ERRO 404 - PAGINA Nï¿½O EXISTE!!!');
         $this->TErro("erro");
     }
 
     public function VIEW_404() {
-        $this->addDados('erro', 'VIEW - NÃO EXISTE!!!');
+        $this->addDados('erro', 'VIEW - NÃƒO EXISTE!!!');
         $this->TErro("erro");
     }
 
@@ -54,5 +54,3 @@ class ErrorsController extends TErrors {
     }
 
 }
-
-?>

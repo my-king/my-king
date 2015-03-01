@@ -418,6 +418,62 @@ class PgSqlPdoStrategy {
     }
 
     /**
+     * Retorna o maior valor 
+     * @param type $atributo
+     * @param type $where
+     * @return maximo
+     */
+    public function max($atributo, $where = null) {
+        # Atributo existe um Colmap
+        if (!isset($this->propAtributos[$atributo]['Colmap'])) {
+            return false;
+        }
+
+        # pegar valor da coluna
+        $coluna = $this->propAtributos[$atributo]['Colmap'];
+
+        # Definir WHERE
+        $where = ($where !== null) ? "WHERE {$where}" : '';
+
+        if ($this->getSchema() !== false) {
+            $query = "SELECT MAX({$coluna}) AS maximo FROM {$this->getSchema()}.{$this->getTable()} {$where}";
+        } else {
+            $query = "SELECT MAX({$coluna}) AS maximo FROM {$this->getTable()} {$where}";
+        }
+
+        $totalRegistros = $this->select($query);
+        return ($totalRegistros['maximo'] === NULL) ? false : $totalRegistros['maximo'];
+    }
+
+    /**
+     * Retorna o menor valor 
+     * @param type $atributo
+     * @param type $where
+     * @return minimo
+     */
+    public function min($atributo, $where = null) {
+        # Atributo existe um Colmap
+        if (!isset($this->propAtributos[$atributo]['Colmap'])) {
+            return false;
+        }
+
+        # pegar valor da coluna
+        $coluna = $this->propAtributos[$atributo]['Colmap'];
+
+        # Definir WHERE
+        $where = ($where !== null) ? "WHERE {$where}" : '';
+
+        if ($this->getSchema() !== false) {
+            $query = "SELECT MIN({$coluna}) AS minimo FROM {$this->getSchema()}.{$this->getTable()} {$where}";
+        } else {
+            $query = "SELECT MIN({$coluna}) AS minimo FROM {$this->getTable()} {$where}";
+        }
+
+        $totalRegistros = $this->select($query);
+        return ($totalRegistros['minimo'] === NULL) ? false : $totalRegistros['minimo'];
+    }
+
+    /**
      * Lista uma collection de objetos sem formatação
      * @param type $where
      * @param type $objectCollection
@@ -643,7 +699,7 @@ class PgSqlPdoStrategy {
             $result = array();
             $result[0] = false;
             $result[1] = $dados;
-            $result[2]['post'] = 'Não pode ser salvo (Para salvar precisa passar um objto ou um array)';
+            $result[2]['post'] = 'Não pode ser salvo (Para salvar precisa passar um objeto ou um array)';
             return $result;
         }
 
@@ -651,15 +707,23 @@ class PgSqlPdoStrategy {
         $id_colmap = $this->propAtributos['id']['Colmap'];
 
         if (isset($dados[$id_colmap]) && $dados[$id_colmap] != "") { // existe id em $dados
+            $tObject = $this->totalRegistro("{$id_colmap} = '{$dados[$id_colmap]}'");
             if (!$id_serial) { // id não é serial
-                $objeto = $this->obterPorId($dados[$id_colmap]);
-
-                if (!$objeto) {
+                if ($tObject === '0') {
                     return $this->inserir($dados, $objectResult);
                 } else {
                     return $this->atualizar($dados, $objectResult, $exception);
                 }
             } else { // id é serial
+                
+                if($tObject === '0') {
+                    $result = array();
+                    $result[0] = false;
+                    $result[1] = $dados;
+                    $result[2]['error'] = "ID do objeto informado não existe na base de dados ( {$id_colmap} = '{$dados[$id_colmap]}' ).";
+                    return $result;
+                }
+                
                 return $this->atualizar($dados, $objectResult, $exception);
             }
         } else { // Não existe id
@@ -1821,7 +1885,7 @@ class PgSqlPdoStrategy {
                         foreach ($campos as $value) {
                             if (isset($relationship->coluna)) {
                                 $collection[$atributo][$relationship->coluna][] = $value;
-                            }else{
+                            } else {
                                 $collection[$atributo][$id_relationship][] = $value;
                             }
                         }
@@ -1835,7 +1899,7 @@ class PgSqlPdoStrategy {
                 }
             }
         }
-        
+
         // Inserir na base de dados
         try {
 
@@ -1923,5 +1987,3 @@ class PgSqlPdoStrategy {
     }
 
 }
-
-?>

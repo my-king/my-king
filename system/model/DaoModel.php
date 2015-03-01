@@ -41,10 +41,10 @@ abstract class DaoModel {
         $this->strategy = new $strategy($connectionDB, $objReflectionORM);
     }
 
-    public function obter($where, $objectCollection = null) {
+    public function obter($where, $objectCollection = null, $exception = null) {
 
         #pegar objeto pelo id
-        $objeto = $this->strategy->obter($where, $objectCollection);
+        $objeto = $this->strategy->obter($where, $objectCollection, $exception);
 
         # Se o retorno for false
         if (!$objeto) {
@@ -69,22 +69,26 @@ abstract class DaoModel {
         return $objeto;
     }
 
-    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null) {
+    public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null, $limit = null) {
 
-        #pegar coleção de objetos
-        $collection = $this->strategy->listar($where, $orderby, $objectCollection, $exception, $offset);
+        /* Pegar coleÃ§Ã£o de objetos */
+        $collection = $this->strategy->listar($where, $orderby, $objectCollection, $exception, $offset, $limit);
 
         # Se o retorno for false
         if (!$collection) {
             return false;
         }
 
-        # retorna uma coleção de objetos
+        /* retorna uma coleÃ§Ã£o de objetos */
         return $collection;
     }
 
     public function salvar($dados, $objectResult = null, $exception = null) {
         return $this->strategy->salvar($dados, $objectResult, $exception);
+    }
+
+    public function deleteQuery($from, $where, Array $dados = null) {
+        return $this->strategy->deleteQuery($from, $where, $dados);
     }
 
     public function excluirPorId($id) {
@@ -95,6 +99,7 @@ abstract class DaoModel {
         }
     }
 
+    
     public function excluir($where, $dados = null) {
         return $this->strategy->excluir($where, $dados);
     }
@@ -130,7 +135,11 @@ abstract class DaoModel {
     public function somar($atributo, $where = null) {
          return $this->strategy->somar($atributo, $where);
     }
+    public function maiorValor($atributo, $where = null) {
+         return $this->strategy->max($atributo, $where);
+    }
+    public function menorValor($atributo, $where = null) {
+         return $this->strategy->min($atributo, $where);
+    }
 
 }
-
-?>
