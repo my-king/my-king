@@ -10,17 +10,17 @@ class PgSqlDrive {
 
     public function getConn() {
         $dados = $this->classConn;
+        $port = ($dados->port !== null) ? "port={$dados->port};" : '';
         try {
-            $conn = new PDO("{$dados->type}:host={$dados->server};port={$dados->port};dbname={$dados->database};", //servidor e Banco de Dados 
-                    "{$dados->user}", //usuario
-                    "{$dados->password}", array(PDO::ATTR_PERSISTENT => true)
+            $conn = new PDO("{$dados->type}:host={$dados->server};{$port}dbname={$dados->database};", "{$dados->user}", "{$dados->password}", array(PDO::ATTR_PERSISTENT => true)
             );
+            isset($port);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $conn->exec("SET NAMES 'iso-8859-1'");
 
             return $conn;
         } catch (Exception $e) {
-            LogErroORM::gerarLog("CONEXAO - N�O FOI POSSIVEL ESTABELECER UMA CONEX�O COM O SERVIDOR", $e->getMessage());
+            LogErroORM::gerarLog("CONEXAO - NÃO FOI POSSIVEL ESTABELECER UMA CONEX�O COM O SERVIDOR", $e->getMessage());
             return false;
         }
     }

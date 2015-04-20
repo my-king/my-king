@@ -29,7 +29,7 @@ class ErrorsController extends TErrors {
     }
 
     public function HTTP_404() {
-        $this->addDados('erro', 'ERRO 404 - PAGINA N�O EXISTE!!!');
+        $this->addDados('erro', 'ERRO 404 - PAGINA NÃO EXISTE!!!');
         $this->TErro("erro");
     }
 
