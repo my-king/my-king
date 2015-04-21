@@ -67,7 +67,7 @@ class ConnORM {
     }
 
     private function getDadosConexao(&$nameDal) {
-        $ini = parse_ini_file('system/config/config.ini', true);
+        $ini = parse_ini_file('system/config/dal.ini', true);
         return (isset($ini[$nameDal])) ? $ini[$nameDal] : false;
     }
 

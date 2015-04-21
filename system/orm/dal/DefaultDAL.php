@@ -21,7 +21,7 @@ class DefaultDAL extends PdoFactoryORM{
     }    
 
     public function getDadosConexao() {
-        $ini = parse_ini_file('system/config/config.ini', true);
+        $ini = parse_ini_file('system/config/dal.ini', true);
         return $ini['DefaultDAL'];
     }    
     
