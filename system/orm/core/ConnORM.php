@@ -24,7 +24,14 @@ class ConnORM {
     public function __clone() {
         trigger_error('Clone não é permitido.', E_USER_ERROR);
     }
-
+    
+    private function isNotice($key, &$conn) {
+        if (!$conn) {
+            $this->unregister($key);
+            RedirectorHelper::goToControllerAction("Errors", "database");
+        }
+    }
+    
     public function get($key) {
         if ($this->storage->offsetExists($key)) {
             $conn = $this->storage->offsetGet($key);
@@ -56,6 +63,7 @@ class ConnORM {
         } else {
             /* Criar objeto com dados para conexão */
             $classConn = new stdClass();
+            $classConn->lib = $dados['lib'];
             $classConn->type = $dados['type'];
             $classConn->server = $dados['server'];
             $classConn->port = (isset($dados['port'])) ? $dados['port'] : null;
