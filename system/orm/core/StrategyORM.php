@@ -5,21 +5,20 @@ class StrategyORM {
     public static function getStrategy(&$class) {
         
         $reflection = new ReflectionORM($class);
+        $registry = RegistryORM::getInstancia();
         $Dal = ($reflection->getClassAnnotations('@Dal') === '') ? 'DefaultDAL' : $reflection->getClassAnnotations('@Dal');
-        $DAL = $Dal::getInstancia();
-        
-        if (!file_exists(PATH_SYSTEM . "orm/dal/{$Dal}.php")) {
-            LogErroORM::gerarLog('Tentativa de Conexão', 'O arquivo [' . PATH_SYSTEM . 'orm/dal/'.$Dal.'.php] não existe, verifique o arquivo de configuração de banco de dados ou adicione a intancia de conexão ao diretorio');
-            return false;
-        }
+        $classConn = $registry->getClassConn($Dal);
         
         $type = array("mysql" => "MySql", "pgsql" => "PgSql");
-        if (isset($type[$DAL->getType()])) {
-            $strategy = $type[$DAL->getType()] . $DAL->getFactory() . "Strategy";
-            $conexao = $DAL->connectDB();
+        if (isset($type[$classConn->type])) {
+            $strategy = $type[$classConn->type] . ucfirst($classConn->lib) . "Strategy";
+            $registry->set($Dal);
+            $conexao = $registry->get($Dal); 
+            unset($classConn,$Dal);
             return new $strategy($conexao, $reflection);
         } else {
-            LogErroORM::gerarLog('Tentativa de Conexão', 'O tipo da conexão [' . $DAL->getType() . '] informada não existe, verifique o arquivo de configuração de banco de dados');
+            LogErroORM::gerarLog('Tentativa de Conexão', 'O tipo da conexão [' . $classConn->type . '] informada não existe, verifique o arquivo de configuração de banco de dados');
+            unset($classConn,$Dal);
             return false;
         }
         

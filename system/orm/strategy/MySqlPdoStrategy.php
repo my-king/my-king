@@ -120,7 +120,7 @@ class MySqlPdoStrategy {
     }
 
     /**
-     * Realiza a operação de select no banco de dados
+     * Realiza a operaï¿½ï¿½o de select no banco de dados
      * Retorna 1 linha da tabela
      * @param type $query
      * @param array $dados
@@ -149,7 +149,7 @@ class MySqlPdoStrategy {
     }
 
     /**
-     * Realiza a operação de select no banco de dados
+     * Realiza a operaï¿½ï¿½o de select no banco de dados
      * Retorna multiplas linha da tabela
      * @param type $query
      * @param array $dados
@@ -178,7 +178,7 @@ class MySqlPdoStrategy {
     }
 
     /**
-     * Realiza a operação de select no banco de dados
+     * Realiza a operaï¿½ï¿½o de select no banco de dados
      * Retorna multiplas linha da tabela
      * @param type $query
      * @param array $dados
@@ -379,7 +379,7 @@ class MySqlPdoStrategy {
     }
 
     /**
-     * Lista uma collection de objetos sem formatação
+     * Lista uma collection de objetos sem formataï¿½ï¿½o
      * @param type $where
      * @param type $objectCollection
      * @return boolean
@@ -604,7 +604,7 @@ class MySqlPdoStrategy {
             $result = array();
             $result[0] = false;
             $result[1] = $dados;
-            $result[2]['post'] = 'Não pode ser salvo (Para salvar precisa passar um objto ou um array)';
+            $result[2]['post'] = 'Nï¿½o pode ser salvo (Para salvar precisa passar um objto ou um array)';
             return $result;
         }
 
@@ -612,7 +612,7 @@ class MySqlPdoStrategy {
         $id_colmap = $this->propAtributos['id']['Colmap'];
 
         if (isset($dados[$id_colmap]) && $dados[$id_colmap] != "") { // existe id em $dados
-            if (!$id_serial) { // id não é serial
+            if (!$id_serial) { // id nï¿½o ï¿½ serial
                 $objeto = $this->obterPorId($dados[$id_colmap]);
 
                 if (!$objeto) {
@@ -620,18 +620,18 @@ class MySqlPdoStrategy {
                 } else {
                     return $this->atualizar($dados, $objectResult, $exception);
                 }
-            } else { // id é serial
+            } else { // id ï¿½ serial
                 return $this->atualizar($dados, $objectResult, $exception);
             }
-        } else { // Não existe id
+        } else { // Nï¿½o existe id
             return $this->inserir($dados, $objectResult);
         }
     }
 
     /**
-     * Executa query de delete de acordo as configurações
-     *  passadas ignorando o objeto instanciado, os dados são passado 
-     *  no formato de array onde o indice é o nome do campo no banco de dados
+     * Executa query de delete de acordo as configuraï¿½ï¿½es
+     *  passadas ignorando o objeto instanciado, os dados sï¿½o passado 
+     *  no formato de array onde o indice ï¿½ o nome do campo no banco de dados
      *  e value o valor buscado para o mesmo
      * @example $dados['ide_qualquer'] = 1
      * @param string $from
@@ -647,7 +647,7 @@ class MySqlPdoStrategy {
         // Deletar intens da base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             // Preparar query
@@ -661,7 +661,7 @@ class MySqlPdoStrategy {
             # executar query
             $prepare->execute();
 
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollBack();
@@ -686,7 +686,7 @@ class MySqlPdoStrategy {
         // Deletar intens da base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             // Preparar query
@@ -695,7 +695,7 @@ class MySqlPdoStrategy {
             # executar query
             $prepare->execute();
 
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollBack();
@@ -708,7 +708,7 @@ class MySqlPdoStrategy {
     }
 
     /**
-     * Deletar uma coleção de dados na base de dados
+     * Deletar uma coleï¿½ï¿½o de dados na base de dados
      * @param type $id
      * @return type
      */
@@ -721,7 +721,7 @@ class MySqlPdoStrategy {
         // Deletar intens da base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             foreach ($ids as $id) {
@@ -732,7 +732,7 @@ class MySqlPdoStrategy {
             }
 
             // Preparar query
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollBack();
@@ -745,7 +745,7 @@ class MySqlPdoStrategy {
     }
 
     /**
-     * Deletar uma coleção de dados na base de dados
+     * Deletar uma coleï¿½ï¿½o de dados na base de dados
      * @param type $id
      * @return type
      */
@@ -756,7 +756,7 @@ class MySqlPdoStrategy {
         // Deletar intens da base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             # Preparar query
@@ -773,7 +773,7 @@ class MySqlPdoStrategy {
             $prepare->execute();
 
             // Preparar query
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollBack();
@@ -946,7 +946,7 @@ class MySqlPdoStrategy {
     /**
      * Carrega o objeto atravez do array passado
      * @param type $array
-     *  null : não carrega, false: carrega id, true carrega obj
+     *  null : nï¿½o carrega, false: carrega id, true carrega obj
      * @param type $objectCollection
      * @return boolean
      */
@@ -979,7 +979,7 @@ class MySqlPdoStrategy {
                 # Se exite uma referencia do Colmap no atributo
                 if ($colmap !== false) {
 
-                    # Se existe um colmap e ele é diferente de '' e null
+                    # Se existe um colmap e ele ï¿½ diferente de '' e null
                     if (isset($array[$colmap]) && $array[$colmap] !== '' && $array[$colmap] !== null) {
 
                         if ($objectCollection === null || $objectCollection === false) {
@@ -1155,7 +1155,7 @@ class MySqlPdoStrategy {
     /**
      * Carrega o objeto sem formatacao atravez do array passado
      * @param type $array
-     *  null : não carrega, false: carrega id, true carrega obj
+     *  null : nï¿½o carrega, false: carrega id, true carrega obj
      * @param type $objectCollection
      * @return boolean
      */
@@ -1407,7 +1407,7 @@ class MySqlPdoStrategy {
 
         if (!$dados[0]) {
             $result[0] = false;
-            $result[2]['null'] = "Não existe dados a ser inserido";
+            $result[2]['null'] = "Nï¿½o existe dados a ser inserido";
             return $result;
         }
 
@@ -1475,14 +1475,14 @@ class MySqlPdoStrategy {
             }
         } else {
             $result[0] = false;
-            $result[2]['null'][] = "Não existe dados a ser inserido";
+            $result[2]['null'][] = "Nï¿½o existe dados a ser inserido";
             return $result;
         }
 
         // Inserir na base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             $prepare = $this->conn->prepare($insert_query);
@@ -1615,7 +1615,7 @@ class MySqlPdoStrategy {
                             }
                         }
                     }
-                } else { // se colmap não for false
+                } else { // se colmap nï¿½o for false
                     if ($atributo === 'id') {
 
                         $id_serial = (isset($propriedades['Serial'])) ? true : false;
@@ -1745,7 +1745,7 @@ class MySqlPdoStrategy {
         // Inserir na base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             // Preparar query da entity
@@ -1791,7 +1791,7 @@ class MySqlPdoStrategy {
                 }
             }
 
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
 
