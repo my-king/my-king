@@ -6,14 +6,14 @@ class StrategyORM {
         
         $reflection = new ReflectionORM($class);
         $registry = RegistryORM::getInstancia();
-        $Dal = ($reflection->getClassAnnotations('@Dal') === '') ? 'DefaultDAL' : $reflection->getClassAnnotations('@Dal');
+        $Dal = ($reflection->getClassAnnotations('@Dal') === '') ? 'default' : $reflection->getClassAnnotations('@Dal');
         $classConn = $registry->getClassConn($Dal);
-        
+
         $type = array("mysql" => "MySql", "pgsql" => "PgSql");
         if (isset($type[$classConn->type])) {
             $strategy = $type[$classConn->type] . ucfirst($classConn->lib) . "Strategy";
             $registry->set($Dal);
-            $conexao = $registry->get($Dal); 
+            $conexao = $registry->get($Dal);
             unset($classConn,$Dal);
             return new $strategy($conexao, $reflection);
         } else {

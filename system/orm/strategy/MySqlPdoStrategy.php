@@ -436,7 +436,7 @@ class MySqlPdoStrategy {
 
                     if (is_object($array[0])) {
 
-                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM(get_class($array[0])));
+                        $strategy = StrategyORM::getStrategy(get_class($array[0]));
 
                         foreach ($array as $objeto) {
                             $arrayObjeto[] = $strategy->objectToArray($objeto);
@@ -484,7 +484,7 @@ class MySqlPdoStrategy {
 
                         if (isset($propriedades['OneToMany'])) {
 
-                            $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                            $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
 
                             foreach ($object->$getValue() as $key => $item) {
                                 if (is_object($item)) {
@@ -569,7 +569,7 @@ class MySqlPdoStrategy {
                     if (is_array($array[$atributo])) {
 
                         if (isset($propriedades['OneToMany'])) {
-                            $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                            $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                             foreach ($array[$atributo] as $key => $item) {
                                 $dados[$atributo][$key] = $strategy->atributoToColmap($item);
                             }
@@ -833,7 +833,7 @@ class MySqlPdoStrategy {
 
                     if (isset($propriedades['OneToMany'])) {
 
-                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                        $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                         $id_atributo = $strategy->reflection->getAtributo($id_colmap);
 
                         foreach ($array[$atributo] as $key => $item) {
@@ -995,7 +995,7 @@ class MySqlPdoStrategy {
 
                             if (isset($propriedades['OneToOne'])) {
 
-                                $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
+                                $strategy = StrategyORM::getStrategy($propriedades['OneToOne']['objeto']);
 
                                 $object = $strategy->obterPorId($array[$colmap], false, $exceptionObject);
 
@@ -1020,7 +1020,7 @@ class MySqlPdoStrategy {
 
                     if (isset($propriedades['OneToMany'])) {
 
-                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                        $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                         if (isset($propriedades['OneToMany']['coluna'])) {
                             $listObjeto = $strategy->listar("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
                         } else {
@@ -1043,7 +1043,7 @@ class MySqlPdoStrategy {
                             }
                         }
 
-                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                        $strategy = StrategyORM::getStrategy($propriedades['ManyToMany']['objeto']);
 
 
                         if (isset($propriedades['ManyToMany']['coluna'])) {
@@ -1082,7 +1082,7 @@ class MySqlPdoStrategy {
 
                     if (isset($propriedades['OneToMany'])) {
 
-                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                        $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
 
                         if (isset($propriedades['OneToMany']['coluna'])) {
                             $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
@@ -1113,7 +1113,7 @@ class MySqlPdoStrategy {
                             }
                         }
 
-                        $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                        $strategy = StrategyORM::getStrategy($propriedades['ManyToMany']['objeto']);
 
                         if (isset($propriedades['ManyToMany']['coluna'])) {
                             $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()} {$selectException}";
@@ -1183,7 +1183,7 @@ class MySqlPdoStrategy {
 
                         if (isset($propriedades['OneToOne'])) {
 
-                            $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
+                            $strategy = StrategyORM::getStrategy($propriedades['OneToOne']['objeto']);
 
                             $object = $strategy->obterPorIdUnFormatted($array[$colmap], false);
 
@@ -1202,7 +1202,7 @@ class MySqlPdoStrategy {
 
                 if (isset($propriedades['OneToMany'])) {
 
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                    $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
 
                     if (isset($propriedades['OneToMany']['coluna'])) {
                         $listObjeto = $strategy->listarUnFormatted("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
@@ -1227,7 +1227,7 @@ class MySqlPdoStrategy {
                     }
 
 
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                    $strategy = StrategyORM::getStrategy($propriedades['ManyToMany']['objeto']);
 
                     if (isset($propriedades['ManyToMany']['coluna'])) {
                         $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
@@ -1264,7 +1264,7 @@ class MySqlPdoStrategy {
 
                 if (isset($propriedades['OneToMany'])) {
 
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                    $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
 
                     if (isset($propriedades['OneToMany']['coluna'])) {
                         $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
@@ -1287,7 +1287,7 @@ class MySqlPdoStrategy {
                     unset($strategy);
                 } elseif (isset($propriedades['ManyToMany'])) {
 
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                    $strategy = StrategyORM::getStrategy($propriedades['ManyToMany']['objeto']);
 
                     if (isset($propriedades['ManyToMany']['coluna'])) {
                         $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
@@ -1430,7 +1430,7 @@ class MySqlPdoStrategy {
 
                 foreach ($inserir['OneToMany'] as $atributo => $values) {
 
-                    $strategy = new MySqlPdoStrategy($this->conn, new ReflectionORM($this->propAtributos[$atributo]['OneToMany']['objeto']));
+                    $strategy = StrategyORM::getStrategy($this->propAtributos[$atributo]['OneToMany']['objeto']);
 
                     foreach ($values as $key => $row) {
 

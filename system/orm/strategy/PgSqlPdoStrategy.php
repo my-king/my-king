@@ -146,7 +146,7 @@ class PgSqlPdoStrategy {
     }
 
     /**
-     * Realiza a operação de select no banco de dados
+     * Realiza a operaï¿½ï¿½o de select no banco de dados
      * Retorna 1 linha da tabela
      * @param type $query
      * @param array $dados
@@ -175,7 +175,7 @@ class PgSqlPdoStrategy {
     }
 
     /**
-     * Realiza a operação de select no banco de dados
+     * Realiza a operaï¿½ï¿½o de select no banco de dados
      * Retorna multiplas linha da tabela
      * @param type $query
      * @param array $dados
@@ -204,7 +204,7 @@ class PgSqlPdoStrategy {
     }
 
     /**
-     * Realiza a operação de select no banco de dados
+     * Realiza a operaï¿½ï¿½o de select no banco de dados
      * Retorna multiplas linha da tabela
      * @param type $query
      * @param array $dados
@@ -474,7 +474,7 @@ class PgSqlPdoStrategy {
     }
 
     /**
-     * Lista uma collection de objetos sem formatação
+     * Lista uma collection de objetos sem formataï¿½ï¿½o
      * @param type $where
      * @param type $objectCollection
      * @return boolean
@@ -530,9 +530,8 @@ class PgSqlPdoStrategy {
                     $array = $object->$getValue();
 
                     if (is_object($array[0])) {
-
-                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM(get_class($array[0])));
-
+                        
+                        $strategy = StrategyORM::getStrategy(get_class($array[0]));
                         foreach ($array as $objeto) {
                             $arrayObjeto[] = $strategy->objectToArray($objeto);
                         }
@@ -578,9 +577,7 @@ class PgSqlPdoStrategy {
                     if (is_array($object->$getValue())) {
 
                         if (isset($propriedades['OneToMany'])) {
-
-                            $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
-
+                            $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                             foreach ($object->$getValue() as $key => $item) {
                                 if (is_object($item)) {
                                     $dados[$atributo][$key] = $strategy->objectToArrayColmap($item);
@@ -664,7 +661,7 @@ class PgSqlPdoStrategy {
                     if (is_array($array[$atributo])) {
 
                         if (isset($propriedades['OneToMany'])) {
-                            $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                            $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                             foreach ($array[$atributo] as $key => $item) {
                                 $dados[$atributo][$key] = $strategy->atributoToColmap($item);
                             }
@@ -699,7 +696,7 @@ class PgSqlPdoStrategy {
             $result = array();
             $result[0] = false;
             $result[1] = $dados;
-            $result[2]['post'] = 'Não pode ser salvo (Para salvar precisa passar um objeto ou um array)';
+            $result[2]['post'] = 'Nï¿½o pode ser salvo (Para salvar precisa passar um objeto ou um array)';
             return $result;
         }
 
@@ -708,33 +705,33 @@ class PgSqlPdoStrategy {
 
         if (isset($dados[$id_colmap]) && $dados[$id_colmap] != "") { // existe id em $dados
             $tObject = $this->totalRegistro("{$id_colmap} = '{$dados[$id_colmap]}'");
-            if (!$id_serial) { // id não é serial
+            if (!$id_serial) { // id nï¿½o ï¿½ serial
                 if ($tObject === '0') {
                     return $this->inserir($dados, $objectResult);
                 } else {
                     return $this->atualizar($dados, $objectResult, $exception);
                 }
-            } else { // id é serial
+            } else { // id ï¿½ serial
                 
                 if($tObject === '0') {
                     $result = array();
                     $result[0] = false;
                     $result[1] = $dados;
-                    $result[2]['error'] = "ID do objeto informado não existe na base de dados ( {$id_colmap} = '{$dados[$id_colmap]}' ).";
+                    $result[2]['error'] = "ID do objeto informado nï¿½o existe na base de dados ( {$id_colmap} = '{$dados[$id_colmap]}' ).";
                     return $result;
                 }
                 
                 return $this->atualizar($dados, $objectResult, $exception);
             }
-        } else { // Não existe id
+        } else { // Nï¿½o existe id
             return $this->inserir($dados, $objectResult);
         }
     }
 
     /**
-     * Executa query de delete de acordo as configurações
-     *  passadas ignorando o objeto instanciado, os dados são passado 
-     *  no formato de array onde o indice é o nome do campo no banco de dados
+     * Executa query de delete de acordo as configuraï¿½ï¿½es
+     *  passadas ignorando o objeto instanciado, os dados sï¿½o passado 
+     *  no formato de array onde o indice ï¿½ o nome do campo no banco de dados
      *  e value o valor buscado para o mesmo
      * @example $dados['ide_qualquer'] = 1
      * @param string $from
@@ -750,7 +747,7 @@ class PgSqlPdoStrategy {
         // Deletar intens da base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             // Preparar query
@@ -764,7 +761,7 @@ class PgSqlPdoStrategy {
             # executar query
             $prepare->execute();
 
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollBack();
@@ -789,7 +786,7 @@ class PgSqlPdoStrategy {
         // Deletar intens da base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             // Preparar query
@@ -798,7 +795,7 @@ class PgSqlPdoStrategy {
             # executar query
             $prepare->execute();
 
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollBack();
@@ -811,7 +808,7 @@ class PgSqlPdoStrategy {
     }
 
     /**
-     * Deletar uma coleção de dados na base de dados
+     * Deletar uma coleï¿½ï¿½o de dados na base de dados
      * @param type $id
      * @return type
      */
@@ -824,7 +821,7 @@ class PgSqlPdoStrategy {
         // Deletar intens da base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             foreach ($ids as $id) {
@@ -835,7 +832,7 @@ class PgSqlPdoStrategy {
             }
 
             // Preparar query
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollBack();
@@ -848,7 +845,7 @@ class PgSqlPdoStrategy {
     }
 
     /**
-     * Deletar uma coleção de dados na base de dados
+     * Deletar uma coleï¿½ï¿½o de dados na base de dados
      * @param type $id
      * @return type
      */
@@ -859,7 +856,7 @@ class PgSqlPdoStrategy {
         // Deletar intens da base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             # Preparar query
@@ -876,7 +873,7 @@ class PgSqlPdoStrategy {
             $prepare->execute();
 
             // Preparar query
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
             $this->conn->rollBack();
@@ -935,8 +932,7 @@ class PgSqlPdoStrategy {
                 if (isset($array[$atributo]) && is_array($array[$atributo])) {
 
                     if (isset($propriedades['OneToMany'])) {
-
-                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                        $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                         $id_atributo = $strategy->reflection->getAtributo($id_colmap);
 
                         foreach ($array[$atributo] as $key => $item) {
@@ -1049,7 +1045,7 @@ class PgSqlPdoStrategy {
     /**
      * Carrega o objeto atravez do array passado
      * @param type $array
-     *  null : não carrega, false: carrega id, true carrega obj
+     *  null : nï¿½o carrega, false: carrega id, true carrega obj
      * @param type $objectCollection
      * @return boolean
      */
@@ -1082,7 +1078,7 @@ class PgSqlPdoStrategy {
                 # Se exite uma referencia do Colmap no atributo
                 if ($colmap !== false) {
 
-                    # Se existe um colmap e ele é diferente de '' e null
+                    # Se existe um colmap e ele ï¿½ diferente de '' e null
                     if (isset($array[$colmap]) && $array[$colmap] !== '' && $array[$colmap] !== null) {
 
                         if ($objectCollection === null || $objectCollection === false) {
@@ -1097,9 +1093,7 @@ class PgSqlPdoStrategy {
                         } elseif ($objectCollection === true) {
 
                             if (isset($propriedades['OneToOne'])) {
-
-                                $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
-
+                                $strategy = StrategyORM::getStrategy($propriedades['OneToOne']['objeto']);
                                 $object = $strategy->obterPorId($array[$colmap], false, $exceptionObject);
 
                                 if (is_object($object)) {
@@ -1122,8 +1116,7 @@ class PgSqlPdoStrategy {
                 } elseif ($objectCollection === true) {
 
                     if (isset($propriedades['OneToMany'])) {
-
-                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
+                        $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                         if (isset($propriedades['OneToMany']['coluna'])) {
                             $listObjeto = $strategy->listar("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
                         } else {
@@ -1145,9 +1138,8 @@ class PgSqlPdoStrategy {
                                 $selectException = "AND " . $exception['select'][$atributo];
                             }
                         }
-
-                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
-
+                        
+                        $strategy = StrategyORM::getStrategy($propriedades['ManyToMany']['objeto']);
                         if (isset($propriedades['ManyToMany']['schema'])) {
                             if (isset($propriedades['ManyToMany']['coluna'])) {
                                 $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
@@ -1191,9 +1183,8 @@ class PgSqlPdoStrategy {
                 } elseif ($objectCollection === false) {
 
                     if (isset($propriedades['OneToMany'])) {
-
-                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
-
+                        
+                        $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                         if (isset($propriedades['OneToMany']['coluna'])) {
                             $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
                         } else {
@@ -1222,8 +1213,8 @@ class PgSqlPdoStrategy {
                                 $selectException = "AND " . $exception['select'][$atributo];
                             }
                         }
-
-                        $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
+                        
+                        $strategy = StrategyORM::getStrategy($propriedades['ManyToMany']['objeto']);
 
                         if (isset($propriedades['ManyToMany']['schema'])) {
                             if (isset($propriedades['ManyToMany']['coluna'])) {
@@ -1273,7 +1264,7 @@ class PgSqlPdoStrategy {
     /**
      * Carrega o objeto sem formatacao atravez do array passado
      * @param type $array
-     *  null : não carrega, false: carrega id, true carrega obj
+     *  null : nï¿½o carrega, false: carrega id, true carrega obj
      * @param type $objectCollection
      * @return boolean
      */
@@ -1300,9 +1291,8 @@ class PgSqlPdoStrategy {
                     } elseif ($objectCollection === true) {
 
                         if (isset($propriedades['OneToOne'])) {
-
-                            $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToOne']['objeto']));
-
+                            
+                            $strategy = StrategyORM::getStrategy($propriedades['OneToOne']['objeto']);
                             $object = $strategy->obterPorIdUnFormatted($array[$colmap], false);
 
                             if (is_object($object)) {
@@ -1319,9 +1309,8 @@ class PgSqlPdoStrategy {
             } elseif ($objectCollection === true) {
 
                 if (isset($propriedades['OneToMany'])) {
-
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
-
+                    
+                    $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                     if (isset($propriedades['OneToMany']['coluna'])) {
                         $listObjeto = $strategy->listarUnFormatted("{$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'", null, false, $exception);
                     } else {
@@ -1344,9 +1333,7 @@ class PgSqlPdoStrategy {
                         }
                     }
 
-
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
-
+                    $strategy = StrategyORM::getStrategy($propriedades['ManyToMany']['objeto']);
                     if (isset($propriedades['ManyToMany']['schema'])) {
                         if (isset($propriedades['ManyToMany']['coluna'])) {
                             $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = '{$objeto->getId()}' {$selectException}";
@@ -1389,9 +1376,8 @@ class PgSqlPdoStrategy {
             } elseif ($objectCollection === false) {
 
                 if (isset($propriedades['OneToMany'])) {
-
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['OneToMany']['objeto']));
-
+                    
+                    $strategy = StrategyORM::getStrategy($propriedades['OneToMany']['objeto']);
                     if (isset($propriedades['OneToMany']['coluna'])) {
                         $query = "SELECT {$strategy->getIdColmap()} FROM {$strategy->getSchema()}.{$strategy->getTable()} WHERE {$propriedades['OneToMany']['coluna']} = '{$objeto->getId()}'";
                     } else {
@@ -1412,9 +1398,8 @@ class PgSqlPdoStrategy {
                     unset($listObjeto);
                     unset($strategy);
                 } elseif (isset($propriedades['ManyToMany'])) {
-
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($propriedades['ManyToMany']['objeto']));
-
+                    
+                    $strategy = StrategyORM::getStrategy($propriedades['ManyToMany']['objeto']);
                     if (isset($propriedades['ManyToMany']['schema'])) {
                         if (isset($propriedades['ManyToMany']['coluna'])) {
                             $query = "SELECT {$propriedades['ManyToMany']['coluna']} FROM {$propriedades['ManyToMany']['schema']}.{$propriedades['ManyToMany']['table']} WHERE {$id_colmap} = {$objeto->getId()}";
@@ -1541,7 +1526,7 @@ class PgSqlPdoStrategy {
 
         if (!$dados[0]) {
             $result[0] = false;
-            $result[2]['null'] = "Não existe dados a ser inserido";
+            $result[2]['null'] = "Nï¿½o existe dados a ser inserido";
             return $result;
         }
 
@@ -1563,9 +1548,8 @@ class PgSqlPdoStrategy {
             if (isset($inserir['OneToMany'])) {
 
                 foreach ($inserir['OneToMany'] as $atributo => $values) {
-
-                    $strategy = new PgSqlPdoStrategy($this->conn, new ReflectionORM($this->propAtributos[$atributo]['OneToMany']['objeto']));
-
+                    
+                    $strategy = StrategyORM::getStrategy($this->propAtributos[$atributo]['OneToMany']['objeto']);
                     foreach ($values as $key => $row) {
 
                         $k = $row;
@@ -1618,14 +1602,14 @@ class PgSqlPdoStrategy {
             }
         } else {
             $result[0] = false;
-            $result[2]['null'][] = "Não existe dados a ser inserido";
+            $result[2]['null'][] = "NÃ£o existe dados a ser inserido";
             return $result;
         }
 
         // Inserir na base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaÃ§Ã£o
             $this->conn->beginTransaction();
 
             $prepare = $this->conn->prepare($insert_query);
@@ -1760,7 +1744,7 @@ class PgSqlPdoStrategy {
                             }
                         }
                     }
-                } else { // se colmap não for false
+                } else { // se colmap nï¿½o for false
                     if ($atributo == 'id') {
 
                         $id_serial = (isset($propriedades['Serial'])) ? true : false;
@@ -1903,7 +1887,7 @@ class PgSqlPdoStrategy {
         // Inserir na base de dados
         try {
 
-            #iniciar transação
+            #iniciar transaï¿½ï¿½o
             $this->conn->beginTransaction();
 
             // Preparar query da entity
@@ -1949,7 +1933,7 @@ class PgSqlPdoStrategy {
                 }
             }
 
-            # Finalizar transação
+            # Finalizar transaï¿½ï¿½o
             $this->conn->commit();
         } catch (Exception $e) {
 
