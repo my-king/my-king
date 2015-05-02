@@ -20,44 +20,69 @@ class RegistryORM {
         trigger_error('Clone não é permitido.', E_USER_ERROR);
     }
 
-    private function isNotice($key, &$conn) {
+    private function isNotice($nameDal, &$conn) {
         if (!$conn) {
-            $this->unregister($key);
+            $this->unregister($nameDal);
             RedirectorHelper::goToControllerAction("Errors", "database");
         }
     }
 
-    public function get($key) {
-        if ($this->storage->offsetExists($key)) {
-            $conn = $this->storage->offsetGet($key);
-            $this->isNotice($key, $conn);
+    public function get($nameDal) {
+        if ($this->storage->offsetExists($nameDal)) {
+            $conn = $this->storage->offsetGet($nameDal);
+            $this->isNotice($nameDal, $conn);
             return $conn;
         }
     }
 
-    private function tryConnect(&$drive,$tentativa = 0) {
+    private function tryConnect(&$drive, $tentativa = 0) {
         $conn = $drive->getConn();
-        if($tentativa === 2){
+        if ($tentativa === 2) {
             return $conn;
-        }else{
-            return ($conn !== false ) ? $conn : $this->tryConnect($drive,$tentativa + 1);
+        } else {
+            return ($conn !== false ) ? $conn : $this->tryConnect($drive, $tentativa + 1);
         }
     }
 
-    public function set($key, &$classConn) {
-        if (!$this->storage->offsetExists($key)) {
+    public function set(&$nameDal) {
+        if (!$this->storage->offsetExists($nameDal)) {
+            $classConn = $this->getClassConn($nameDal);
             $drive = DriveORM::getDrive($classConn);
-            $this->storage->offsetSet($key, $this->tryConnect($drive));
+            $this->storage->offsetSet($nameDal, $this->tryConnect($drive));
             return true;
         } else {
             return false;
         }
     }
 
-    public function unregister($key) {
-        if ($this->storage->offsetExists($key)) {
-            $this->storage->offsetUnset($key);
+    public function unregister(&$nameDal) {
+        if ($this->storage->offsetExists($nameDal)) {
+            $this->storage->offsetUnset($nameDal);
         }
+    }
+
+    public function getClassConn(&$nameDal) {
+        /* Obter dados da conexão */
+        $dados = $this->getDadosConexao($nameDal);
+        if (!$dados) {
+            return false;
+        } else {
+            /* Criar objeto com dados para conexão */
+            $classConn = new stdClass();
+            $classConn->lib = $dados['lib'];
+            $classConn->type = $dados['type'];
+            $classConn->server = $dados['server'];
+            $classConn->port = (isset($dados['port'])) ? $dados['port'] : null;
+            $classConn->database = $dados['database'];
+            $classConn->user = $dados['user'];
+            $classConn->password = $dados['password'];
+            return $classConn;
+        }
+    }
+
+    private function getDadosConexao($nameDal) {
+        $ini = parse_ini_file('system/config/dal.ini', true);
+        return (isset($ini[$nameDal])) ? $ini[$nameDal] : false;
     }
 
 }

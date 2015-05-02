@@ -2,16 +2,9 @@
 
 /**
  * Class de responsavel pela regra de negocio de persistencia de dados
- *
  * @author igor
  */
 abstract class DaoModel {
-
-    /**
-     * Nome da class passada para o construtor
-     * @var type string
-     */
-    private $class;
 
     /**
      * Strategy a ser adotada
@@ -20,25 +13,10 @@ abstract class DaoModel {
     private $strategy;
 
     function __construct($class) {
-        $this->class = $class;
-        $this->conexao();
-    }
-
-    protected function conexao($instacia = null) {
-
-        if ($instacia === null) {
-            $DAL = DefaultDAL::getInstancia();
-        } else {
-            $DAL = $instacia;
+        $this->strategy = StrategyORM::getStrategy($class);
+        if (!$this->strategy) {
+            RedirectorHelper::goToControllerAction('Errors', 'database');
         }
-
-        $type = array("mysql" => "MySql", "pgsql" => "PgSql");
-        $strategy = $type[$DAL->getType()] . $DAL->getFactory() . "Strategy";
-
-        $objReflectionORM = new ReflectionORM($this->class);
-        $connectionDB = $DAL->connectDB();
-
-        $this->strategy = new $strategy($connectionDB, $objReflectionORM);
     }
 
     public function obter($where, $objectCollection = null, $exception = null) {
@@ -99,17 +77,16 @@ abstract class DaoModel {
         }
     }
 
-    
     public function excluir($where, $dados = null) {
         return $this->strategy->excluir($where, $dados);
     }
 
     public function select($query, array $dados = null) {
-        return $this->strategy->select($query,$dados);
+        return $this->strategy->select($query, $dados);
     }
 
     public function selectAll($query, array $dados = null) {
-        return $this->strategy->selectAll($query,$dados);
+        return $this->strategy->selectAll($query, $dados);
     }
 
     public function selectObjectAll($colunas = null, $where = null, $orderby = null, array $dados = null) {
@@ -129,17 +106,19 @@ abstract class DaoModel {
     }
 
     public function totalRegistro($where = null) {
-         return $this->strategy->totalRegistro($where);
+        return $this->strategy->totalRegistro($where);
     }
 
     public function somar($atributo, $where = null) {
-         return $this->strategy->somar($atributo, $where);
+        return $this->strategy->somar($atributo, $where);
     }
+
     public function maiorValor($atributo, $where = null) {
-         return $this->strategy->max($atributo, $where);
+        return $this->strategy->max($atributo, $where);
     }
+
     public function menorValor($atributo, $where = null) {
-         return $this->strategy->min($atributo, $where);
+        return $this->strategy->min($atributo, $where);
     }
 
 }

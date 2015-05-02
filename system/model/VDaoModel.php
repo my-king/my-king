@@ -8,37 +8,16 @@
 abstract class VDaoModel {
 
     /**
-     * Nome da class passada para o construtor
-     * @var type string
-     */
-    private $class;
-
-    /**
      * Strategy a ser adotada
      * @var type 
      */
     private $strategy;
 
     function __construct($class) {
-        $this->class = $class;
-        $this->conexao();
-    }
-
-    protected function conexao($instacia = null) {
-
-        if ($instacia == null) {
-            $DAL = DefaultDAL::getInstancia();
-        } else {
-            $DAL = $instacia;
+        $this->strategy = StrategyORM::getStrategy($class);
+        if (!$this->strategy) {
+            RedirectorHelper::goToControllerAction('Errors', 'database');
         }
-
-        $type = array("mysql" => "MySql", "pgsql" => "PgSql");
-        $strategy = $type[$DAL->getType()] . $DAL->getFactory() . "Strategy";
-
-        $objReflectionORM = new ReflectionORM($this->class);
-        $connectionDB = $DAL->connectDB();
-
-        $this->strategy = new $strategy($connectionDB, $objReflectionORM);
     }
 
     public function obter($where, $objectCollection = null, $exception = null) {
@@ -71,7 +50,7 @@ abstract class VDaoModel {
 
     public function listar($where = null, $orderby = null, $objectCollection = null, $exception = null, $offset = null, $limit = null) {
 
-        #pegar coleção de objetos
+        #pegar coleï¿½ï¿½o de objetos
         $collection = $this->strategy->listar($where, $orderby, $objectCollection, $exception, $offset, $limit);
 
         # Se o retorno for false
@@ -79,7 +58,7 @@ abstract class VDaoModel {
             return false;
         }
 
-        # retorna uma coleção de objetos
+        # retorna uma coleï¿½ï¿½o de objetos
         return $collection;
     }
 
@@ -114,9 +93,11 @@ abstract class VDaoModel {
     public function somar($atributo, $where = null) {
         return $this->strategy->somar($atributo, $where);
     }
+
     public function maiorValor($atributo, $where = null) {
         return $this->strategy->max($atributo, $where);
     }
+
     public function menorValor($atributo, $where = null) {
         return $this->strategy->min($atributo, $where);
     }

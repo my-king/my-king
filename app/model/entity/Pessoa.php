@@ -18,6 +18,13 @@ class Pessoa {
     */
     private $nome;
 
+    /**
+    * @Colmap = ide_sexo
+    * @Persistence (type=inteiro,NotNull=true)
+    * @Relationship (objeto=Sexo,type=OneToOne)
+    */
+    private $sexo;
+
     public function getId() {
         return $this->id;
     }
@@ -32,6 +39,14 @@ class Pessoa {
 
     public function setNome($nome) {
         $this->nome = $nome;
+    }
+
+    public function getSexo() {
+        return $this->sexo;
+    }
+
+    public function setSexo($sexo) {
+        $this->sexo = $sexo;
     }
 
 }

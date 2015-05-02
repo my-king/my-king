@@ -10,21 +10,21 @@ class MySqlDrive {
 
     public function getConn() {
         $dados = $this->classConn;
+        $port = ($dados->port !== null) ? "port={$dados->port};":'';
         try {
-            
             $conn = new PDO(
-                        "{$dados->type}:host={$dados->server};dbname={$dados->database};", //servidor e Banco de Dados 
+                        "{$dados->type}:host={$dados->server};{$port}dbname={$dados->database};", //servidor e Banco de Dados 
                         "{$dados->user}", //usuario
                         "{$dados->password}", // Senha
                         array(
-                            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES latin1", //For�a UTF8
+                            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES latin1", //Força UTF8
                             PDO::ATTR_PERSISTENT => true // Persistir a conexao
                         )
                     );
 
             return $conn;
         } catch (Exception $e) {
-            LogErroORM::gerarLog("CONEXAO - N�O FOI POSSIVEL ESTABELECER UMA CONEX�O COM O SERVIDOR", $e->getMessage());
+            LogErroORM::gerarLog("CONEXÃO - NÃO FOI POSSIVEL ESTABELECER UMA CONEXÃO COM O SERVIDOR", $e->getMessage());
             return false;
         }
     }
